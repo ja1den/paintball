@@ -2,7 +2,8 @@ name: Firebase Deploy
 
 on:
   push:
-    branches: [master]
+    branches-ignore:
+      - '**'
 
 jobs:
   build:
