@@ -1,0 +1,24 @@
+name: Activate License
+
+on:
+  push:
+    branches-ignore:
+      - '**'
+
+jobs:
+  activation:
+    name: Request License
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Manual Activation File
+        id: getManualLicenseFile
+        uses: webbertakken/unity-request-manual-activation-file@v1.1
+        with:
+          unityVersion: 2019.3.6f1
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ steps.getManualLicenseFile.outputs.filePath }}
+          path: ${{ steps.getManualLicenseFile.outputs.filePath }}
