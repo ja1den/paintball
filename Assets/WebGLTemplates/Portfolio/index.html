@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html class="w-100 h-100" lang="en-us">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link
+			rel="shortcut icon"
+			type="image/x-icon"
+			href="https://cdn.roundsquare.site/roundsquare/favicon.ico"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+			integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+			crossorigin="anonymous"
+		/>
+		<title>%UNITY_WEB_NAME%</title>
+
+		<script src="%UNITY_WEBGL_LOADER_URL%"></script>
+		<script>
+			var unityInstance = UnityLoader.instantiate(
+				'game',
+				'%UNITY_WEBGL_BUILD_URL%',
+				{
+					compatibilityCheck: function (
+						unityInstance,
+						onsuccess,
+						onerror
+					) {
+						if (
+							UnityLoader.SystemInfo.hasWebGL &&
+							!UnityLoader.SystemInfo.mobile &&
+							['Edge', 'Firefox', 'Chrome', 'Safari'].indexOf(
+								UnityLoader.SystemInfo.browser
+							) !== -1
+						) {
+							document
+								.getElementById('error')
+								.classList.add('d-none');
+							onsuccess();
+						} else {
+							document
+								.getElementById('game')
+								.classList.add('d-none');
+							onerror();
+						}
+					}
+				}
+			);
+		</script>
+	</head>
+
+	<body class="w-100 h-100">
+		<div id="game" class="w-100 h-100"></div>
+		<div id="error" class="container mt-3">
+			<div class="alert alert-danger" role="alert">
+				<h5 class="alert-heading">Browser not supported!</h5>
+				<p class="mb-0">
+					Take a look at my
+					<a
+						href="https://jadiewadie.roundsquare.site"
+						class="alert-link"
+						>portfolio</a
+					>.
+				</p>
+			</div>
+		</div>
+	</body>
+</html>
