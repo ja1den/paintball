@@ -10,6 +10,33 @@ namespace CustomExtensions
 		{
 			return new Vector3(color.r, color.g, color.b);
 		}
+
+		/*
+		public static byte[] Serialize(this Color color)
+		{
+			Color c = (Color)color;
+		}
+
+		public static Color Deserialize(byte[] data)
+		{
+			return new Color(data[0], data[1], data[2]);
+		}
+		*/
+
+		/*
+		public static object Deserialize(byte[] data)
+		{
+			var result = new MyCustomType();
+			result.Id = data[0];
+			return result;
+		}
+
+		public static byte[] Serialize(object customType)
+		{
+			var c = (MyCustomType)customType;
+			return new byte[] { c.Id };
+		}
+		*/
 	}
 
 	public static class Vector3Extension
