@@ -37,5 +37,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-# VS Code
-.vscode
+# Visual Studio Code Config
+/.vscode/
