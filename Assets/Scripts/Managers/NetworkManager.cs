@@ -12,6 +12,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	void Awake()
 	{
 		PhotonNetwork.AutomaticallySyncScene = true;
+
+		// Custom Types
+		Paintball.CustomTypes.Register();
 	}
 
 	void Start()

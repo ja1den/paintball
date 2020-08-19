@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
-using CustomExtensions;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
@@ -31,19 +29,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	{
 		// Parent
 		transform.SetParent(GameObject.Find("Players").transform);
-
-		// Random Color
-		/*
-		if (photonView.IsMine)
-		{
-			color = Color.HSVToRGB(Random.Range(0f, 1f), 0.5f, 1f);
-
-			Hashtable hashtable = new Hashtable();
-			hashtable.Add("color", color.ToVector3());
-
-			PhotonNetwork.LocalPlayer.SetCustomProperties(hashtable);
-		}
-		*/
 	}
 
 	void FixedUpdate()
@@ -62,31 +47,16 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		mDelta = new Vector3(input.x, input.y, 0f) * speed;
 	}
 
-	// Set a new Color
+	// Update Color
 	public void SetColor(Color _color)
 	{
-		Debug.Log(_color);
-
 		color = _color;
 		renderer.material.color = _color;
 	}
 
-	/*
-	public override void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps)
-	{
-		// Read Network Color
-		object obj;
-		if (photonView.Owner.CustomProperties.TryGetValue("color", out obj))
-		{
-			Vector3 vector = (Vector3)obj;
-			renderer.material.color = vector.ToColor();
-		}
-	}
-	*/
-
+	// Photon Instantiate
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
 	{
-		object[] instantiationData = info.photonView.InstantiationData;
-		SetColor(((Vector3)(instantiationData[0])).ToColor());
+		SetColor((Color)(info.photonView.InstantiationData[0]));
 	}
 }
