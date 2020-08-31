@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
+using UnityEngine.UI.Extensions;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
@@ -14,15 +15,15 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Space(10)]
 
-	public Vector3 mDelta;
+	public Vector2 mDelta;
 
 	[Header("Debug")]
-	new private Renderer renderer;
+	new private SpriteRenderer renderer;
 
 	void Awake()
 	{
 		// Components
-		renderer = GetComponent<Renderer>();
+		renderer = GetComponent<SpriteRenderer>();
 	}
 
 	void Start()
@@ -42,16 +43,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	public void Move(InputAction.CallbackContext context)
 	{
-		// Apply Input
-		Vector2 input = context.ReadValue<Vector2>();
-		mDelta = new Vector3(input.x, input.y, 0f) * speed;
+		mDelta = context.ReadValue<Vector2>() * speed;
 	}
 
 	// Update Color
 	public void SetColor(Color _color)
 	{
-		color = _color;
-		renderer.material.color = _color;
+		color = renderer.color = _color;
 	}
 
 	// Photon Instantiate

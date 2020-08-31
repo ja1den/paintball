@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviour
 {
 	[Header("GameObjects")]
 	public GameObject playerPrefab;
 
-	public override void OnJoinedRoom()
+	void Start()
 	{
 		// Spawn a Player
 		Color color = Color.HSVToRGB(Random.Range(0f, 1f), 0.5f, 1f);
