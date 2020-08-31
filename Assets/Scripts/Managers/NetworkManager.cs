@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -19,21 +20,27 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	void Start()
 	{
-		Connect();
+		// Connect to Photon
+		PhotonNetwork.ConnectUsingSettings();
+		PhotonNetwork.GameVersion = gameVersion;
 	}
 
-	void Connect()
+	public override void OnConnectedToMaster()
 	{
-		if (PhotonNetwork.IsConnected)
+		Debug.Log("Connected to Photon");
+
+		// Join a Random Room
+		PhotonNetwork.JoinRandomRoom();
+	}
+
+	public override void OnJoinedRoom()
+	{
+		Debug.Log("Joined a Room");
+
+		// Load the Game Scene
+		if (PhotonNetwork.IsMasterClient)
 		{
-			// Join a Random Room
-			PhotonNetwork.JoinRandomRoom();
-		}
-		else
-		{
-			// Connect to Photon
-			PhotonNetwork.ConnectUsingSettings();
-			PhotonNetwork.GameVersion = gameVersion;
+			PhotonNetwork.LoadLevel("GameScene");
 		}
 	}
 
@@ -45,16 +52,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		PhotonNetwork.CreateRoom(null, new RoomOptions());
 	}
 
-	public override void OnConnectedToMaster()
-	{
-		Debug.Log("Connected to Photon");
-
-		// Connect to a Room
-		Connect();
-	}
-
 	public override void OnDisconnected(DisconnectCause cause)
 	{
 		Debug.LogWarningFormat($"Disconnected from Photon: {cause}");
 	}
+
+
 }
