@@ -8,7 +8,7 @@ using Photon.Realtime;
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
 	[Header("General")]
-	public string gameVersion = "1.0.0";
+	private string gameVersion = "0.1.0";
 
 	void Awake()
 	{

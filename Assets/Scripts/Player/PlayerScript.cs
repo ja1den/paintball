@@ -7,9 +7,6 @@ using UnityEngine.UI.Extensions;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
-	[Header("General")]
-	public Color color;
-
 	[Header("Movement")]
 	public float speed = 0.4f;
 
@@ -17,14 +14,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	public Vector2 mDelta;
 
-	[Header("Debug")]
-	new private SpriteRenderer renderer;
-
-	void Awake()
-	{
-		// Components
-		renderer = GetComponent<SpriteRenderer>();
-	}
+	[Header("Appearance")]
+	public Color color;
+	public UIPrimitiveBase[] colorables;
 
 	void Start()
 	{
@@ -46,10 +38,22 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		mDelta = context.ReadValue<Vector2>() * speed;
 	}
 
+	public void Look(InputAction.CallbackContext context)
+	{
+		// Look at Cursor
+		Vector3 cursorPos = context.ReadValue<Vector2>();
+		Debug.Log(cursorPos);
+	}
+
 	// Update Color
 	public void SetColor(Color _color)
 	{
-		color = renderer.color = _color;
+		color = _color;
+
+		for (int i = 0; i < colorables.Length; i++)
+		{
+			colorables[i].color = color;
+		}
 	}
 
 	// Photon Instantiate
