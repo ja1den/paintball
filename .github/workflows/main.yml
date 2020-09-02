@@ -10,19 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@main
+      - uses: actions/checkout@main
         with:
           lfs: true
 
-      - name: Cache Library
-        uses: actions/cache@main
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - run: node check
+
+      - uses: actions/cache@main
         with:
           path: Library
           key: Library
 
-      - name: Build
-        uses: webbertakken/unity-builder@master
+      - uses: webbertakken/unity-builder@master
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
@@ -30,8 +33,7 @@ jobs:
           targetPlatform: WebGL
           versioning: None
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@main
+      - uses: actions/upload-artifact@main
         with:
           name: build
           path: build/WebGL/WebGL
@@ -43,17 +45,14 @@ jobs:
     needs: build
 
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@main
+      - uses: actions/checkout@main
 
-      - name: Download Artifact
-        uses: actions/download-artifact@main
+      - uses: actions/download-artifact@main
         with:
           name: build
           path: build
 
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
+      - uses: w9jds/firebase-action@master
         with:
           args: deploy
         env:
