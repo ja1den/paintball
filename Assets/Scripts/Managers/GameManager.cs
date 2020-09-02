@@ -7,34 +7,31 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
 	[Header("GameObjects")]
-	public Canvas canvas;
-
-	[Space(10)]
-
 	public GameObject playerPrefab;
 
-	[Header("Debug")]
-	public RectTransform cTrans;
+	[Header("Appearance")]
+	public Color[] colors;
 
 	void Awake()
 	{
-		// Load the Main Scene
+		// Load the Main Scene (Debug)
 		if (!PhotonNetwork.InRoom)
 		{
 			SceneManager.LoadScene("LoadScene", LoadSceneMode.Single);
 			return;
 		}
 
-		// Components
-		cTrans = canvas.GetComponent<RectTransform>();
+		// Validate
+		if (colors.Length == 0) throw new System.ArgumentException("Array cannot be empty", "colors");
 	}
 
 	void Start()
 	{
 		// Spawn a Player
-		Color color = Color.HSVToRGB(Random.Range(0f, 1f), 0.5f, 1f);
-		Vector3 playerPos = new Vector3(cTrans.rect.width / 2, cTrans.rect.height / 2, 0f);
+		object[] playerData = new object[] { colors[Random.Range(0, colors.Length)] };
+		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0, 0, 0), Quaternion.identity, 0, playerData);
 
-		GameObject playerInstance = PhotonNetwork.Instantiate(playerPrefab.name, playerPos, Quaternion.identity, 0, new object[] { color });
+		// Assign the Camera
+		Camera.main.GetComponent<CameraScript>().target = player;
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
-using UnityEngine.UI.Extensions;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
@@ -16,21 +15,32 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Header("Appearance")]
 	public Color color;
-	public UIPrimitiveBase[] colorables;
+
+	[Space(10)]
+
+	private GameObject body;
+
+	[Header("Debug")]
+	private RectTransform canvas;
+
+	void Awake()
+	{
+		canvas = GameObject.Find("Canvas").GetComponent<RectTransform>();
+		body = transform.Find("Body").gameObject;
+	}
 
 	void Start()
 	{
-		// Parent
 		transform.SetParent(GameObject.Find("Players").transform);
 	}
 
 	void FixedUpdate()
 	{
-		// Check Client
+		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Movement
-		transform.Translate(mDelta);
+		transform.Translate(mDelta, Space.World);
 	}
 
 	public void Move(InputAction.CallbackContext context)
@@ -40,20 +50,22 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	public void Look(InputAction.CallbackContext context)
 	{
+		// Client's Player
+		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
 		// Look at Cursor
-		Vector3 cursorPos = context.ReadValue<Vector2>();
-		Debug.Log(cursorPos);
+		Vector2 cursor = context.ReadValue<Vector2>();
+		Vector2 offset = new Vector2(canvas.rect.width, canvas.rect.height) * 0.5f;
+
+		float angle = Vector2.SignedAngle(Vector2.up, cursor - offset);
+
+		transform.rotation = Quaternion.Euler(0, 0, angle);
 	}
 
 	// Update Color
 	public void SetColor(Color _color)
 	{
-		color = _color;
-
-		for (int i = 0; i < colorables.Length; i++)
-		{
-			colorables[i].color = color;
-		}
+		body.GetComponent<Shapes2D.Shape>().settings.fillColor = color = _color;
 	}
 
 	// Photon Instantiate
