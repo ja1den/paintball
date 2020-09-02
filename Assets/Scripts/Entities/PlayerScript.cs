@@ -11,7 +11,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Space(10)]
 
-	public Vector2 mDelta;
+	public Vector2 direction;
 
 	[Header("Appearance")]
 	public Color color;
@@ -40,12 +40,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Movement
-		transform.Translate(mDelta, Space.World);
+		transform.Translate(direction * speed, Space.World);
 	}
 
 	public void Move(InputAction.CallbackContext context)
 	{
-		mDelta = context.ReadValue<Vector2>() * speed;
+		direction = context.ReadValue<Vector2>();
 	}
 
 	public void Look(InputAction.CallbackContext context)
