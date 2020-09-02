@@ -7,9 +7,6 @@ using Photon.Realtime;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
-	[Header("General")]
-	private string gameVersion = "0.1.0";
-
 	void Awake()
 	{
 		PhotonNetwork.AutomaticallySyncScene = true;
@@ -22,7 +19,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	{
 		// Connect to Photon
 		PhotonNetwork.ConnectUsingSettings();
-		PhotonNetwork.GameVersion = gameVersion;
+		PhotonNetwork.GameVersion = Application.version;
 	}
 
 	public override void OnConnectedToMaster()

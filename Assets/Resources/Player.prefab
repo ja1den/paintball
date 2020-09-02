@@ -45,11 +45,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1134061387153476184}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b299b025cf20a0418b372b9570004d1, type: 3}
+  m_Script: {fileID: 11500000, guid: 699c3d39d7de17d4d864f51e5d1d06c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.2
-  mDelta: {x: 0, y: 0}
+  speed: 0.4
+  direction: {x: 0, y: 0}
   color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &1134061387153476188
 MonoBehaviour:
