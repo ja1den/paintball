@@ -28,6 +28,7 @@ jobs:
         with:
           unityVersion: 2019.3.6f1
           targetPlatform: WebGL
+          versioning: None
 
       - name: Upload Artifact
         uses: actions/upload-artifact@main
