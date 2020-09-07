@@ -7,26 +7,37 @@ using Photon.Pun;
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
 	[Header("Movement")]
-	public float speed = 0.4f;
+	public float speed;
 
 	[Space(10)]
 
 	public Vector2 direction;
 
-	[Header("Appearance")]
-	public Color color;
+	[Header("Shooting")]
+	public Vector2 lookDir;
 
 	[Space(10)]
 
-	private GameObject body;
+	public GameObject bulletPrefab;
+	private GameObject bulletSpawn;
+
+	[Space(10)]
+
+	private float shootTime = 0f;
+
+	[Header("Appearance")]
+	public Color color;
 
 	[Header("Debug")]
 	private RectTransform canvas;
 
 	void Awake()
 	{
+		// World
 		canvas = GameObject.Find("Canvas").GetComponent<RectTransform>();
-		body = transform.Find("Body").gameObject;
+
+		// Child
+		bulletSpawn = transform.Find("Gun").gameObject;
 	}
 
 	void Start()
@@ -57,15 +68,42 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		Vector2 cursor = context.ReadValue<Vector2>();
 		Vector2 offset = new Vector2(canvas.rect.width, canvas.rect.height) * 0.5f;
 
-		float angle = Vector2.SignedAngle(Vector2.up, cursor - offset);
+		lookDir = (cursor - offset).normalized;
 
+		float angle = Vector2.SignedAngle(Vector2.up, lookDir);
 		transform.rotation = Quaternion.Euler(0, 0, angle);
+	}
+
+	public void Fire(InputAction.CallbackContext context)
+	{
+		// Client's Player
+		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
+		// Button Down
+		if (!context.started) return;
+
+		// Limit Rate
+		if (Time.time - 0.25f < shootTime) return;
+		shootTime = Time.time;
+
+		// Spawn a Bullet
+		photonView.RPC("CreateBullet", RpcTarget.All, bulletSpawn.transform.position, lookDir, color);
+	}
+
+	[PunRPC]
+	public void CreateBullet(Vector3 spawnPos, Vector2 direction, Color color)
+	{
+		GameObject bullet = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
+		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
+
+		bulletScript.direction = direction;
+		bulletScript.SetColor(color);
 	}
 
 	// Update Color
 	public void SetColor(Color _color)
 	{
-		body.GetComponent<Shapes2D.Shape>().settings.fillColor = color = _color;
+		GetComponent<Shapes2D.Shape>().settings.fillColor = color = _color;
 	}
 
 	// Photon Instantiate

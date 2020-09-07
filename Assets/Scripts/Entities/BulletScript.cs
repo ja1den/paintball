@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class BulletScript : MonoBehaviour
+public class BulletScript : MonoBehaviour, IPunInstantiateMagicCallback
 {
 	[Header("Movement")]
-	public float speed = 0.4f;
+	public float speed;
 
 	[Space(10)]
 
@@ -17,10 +18,25 @@ public class BulletScript : MonoBehaviour
 	void Start()
 	{
 		transform.SetParent(GameObject.Find("Bullets").transform);
+
+		// Lifetime
+		Destroy(gameObject, 10f);
 	}
 
 	void Update()
 	{
 		transform.Translate(direction * speed, Space.World);
+	}
+
+	// Update Color
+	public void SetColor(Color _color)
+	{
+		GetComponent<Shapes2D.Shape>().settings.fillColor = color = _color;
+	}
+
+	// Photon Instantiate
+	public void OnPhotonInstantiate(PhotonMessageInfo info)
+	{
+		SetColor((Color)(info.photonView.InstantiationData[0]));
 	}
 }
