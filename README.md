@@ -15,4 +15,4 @@ git clone https://github.com/Jadie-Wadie/paintball.git
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+[MIT](LICENSE)

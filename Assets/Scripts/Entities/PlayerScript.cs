@@ -23,6 +23,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Space(10)]
 
+	private bool isShooting = false;
 	private float shootTime = 0f;
 
 	[Header("Appearance")]
@@ -51,7 +52,14 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Movement
-		transform.Translate(direction * speed, Space.World);
+		transform.Translate(direction * speed * Time.deltaTime, Space.World);
+
+		// Shooting
+		if (isShooting && Time.time - 0.25f >= shootTime)
+		{
+			photonView.RPC("CreateBullet", RpcTarget.All, bulletSpawn.transform.position, lookDir, color);
+			shootTime = Time.time;
+		}
 	}
 
 	public void Move(InputAction.CallbackContext context)
@@ -80,14 +88,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Button Down
-		if (!context.started) return;
+		if (context.started)
+			isShooting = true;
 
-		// Limit Rate
-		if (Time.time - 0.25f < shootTime) return;
-		shootTime = Time.time;
-
-		// Spawn a Bullet
-		photonView.RPC("CreateBullet", RpcTarget.All, bulletSpawn.transform.position, lookDir, color);
+		// Button Up
+		if (context.canceled)
+			isShooting = false;
 	}
 
 	[PunRPC]

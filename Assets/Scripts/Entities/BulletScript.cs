@@ -25,7 +25,7 @@ public class BulletScript : MonoBehaviour, IPunInstantiateMagicCallback
 
 	void Update()
 	{
-		transform.Translate(direction * speed, Space.World);
+		transform.Translate(direction * speed * Time.deltaTime, Space.World);
 	}
 
 	// Update Color
