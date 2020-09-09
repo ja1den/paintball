@@ -7,64 +7,69 @@ using Photon.Pun;
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
 	[Header("Movement")]
-	public float speed;
-
-	[Space(10)]
-
-	public Vector2 direction;
-
-	[Header("Shooting")]
-	public Vector2 lookDir;
-
-	[Space(10)]
-
-	public GameObject bulletPrefab;
-	private GameObject bulletSpawn;
-
-	[Space(10)]
-
-	private bool isShooting = false;
-	private float shootTime = 0f;
+	public float moveSpeed;
 
 	[Header("Appearance")]
 	public Color color;
 
+	[Header("Weapons")]
+	public GameObject[] weapons;
+
 	[Header("Debug")]
+	[ReadOnly]
+	public Vector2 moveDirection;
+	[ReadOnly]
+	public Vector2 lookDirection;
+
+	[Space(10)]
+
 	private RectTransform canvas;
+	private Rigidbody2D rb;
+
+	[Space(10)]
+
+	private WeaponScript weaponScript;
 
 	void Awake()
 	{
-		// World
 		canvas = GameObject.Find("Canvas").GetComponent<RectTransform>();
+		rb = GetComponent<Rigidbody2D>();
 
-		// Child
-		bulletSpawn = transform.Find("Gun").gameObject;
+		if (transform.Find("Weapon").childCount > 0)
+		{
+			weaponScript = transform.Find("Weapon").GetChild(0).GetComponent<WeaponScript>();
+		}
 	}
 
 	void Start()
 	{
 		transform.SetParent(GameObject.Find("Players").transform);
+
+		// Choose a Random Weapon
+		if (weapons.Length > 0)
+		{
+			GameObject weaponPrefab = weapons[Random.Range(0, weapons.Length)];
+			weaponPrefab = Instantiate(weaponPrefab, transform.position, Quaternion.identity);
+		}
 	}
 
 	void FixedUpdate()
 	{
-		// Client's Player
-		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+		rb.velocity = moveDirection * moveSpeed;
+	}
 
-		// Movement
-		transform.Translate(direction * speed * Time.deltaTime, Space.World);
-
-		// Shooting
-		if (isShooting && Time.time - 0.25f >= shootTime)
-		{
-			photonView.RPC("CreateBullet", RpcTarget.All, bulletSpawn.transform.position, lookDir, color);
-			shootTime = Time.time;
-		}
+	public void OnPhotonInstantiate(PhotonMessageInfo info)
+	{
+		SetColor((Color)(info.photonView.InstantiationData[0]));
 	}
 
 	public void Move(InputAction.CallbackContext context)
 	{
-		direction = context.ReadValue<Vector2>();
+		// Client's Player
+		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
+		// Direction
+		moveDirection = context.ReadValue<Vector2>();
 	}
 
 	public void Look(InputAction.CallbackContext context)
@@ -76,9 +81,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		Vector2 cursor = context.ReadValue<Vector2>();
 		Vector2 offset = new Vector2(canvas.rect.width, canvas.rect.height) * 0.5f;
 
-		lookDir = (cursor - offset).normalized;
+		lookDirection = (cursor - offset).normalized;
 
-		float angle = Vector2.SignedAngle(Vector2.up, lookDir);
+		float angle = Vector2.SignedAngle(Vector2.up, lookDirection);
 		transform.rotation = Quaternion.Euler(0, 0, angle);
 	}
 
@@ -87,34 +92,15 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-		// Button Down
-		if (context.started)
-			isShooting = true;
-
-		// Button Up
-		if (context.canceled)
-			isShooting = false;
+		// Shoot
+		if (weaponScript)
+		{
+			weaponScript.Shoot(lookDirection, color);
+		}
 	}
 
-	[PunRPC]
-	public void CreateBullet(Vector3 spawnPos, Vector2 direction, Color color)
+	public void SetColor(Color color)
 	{
-		GameObject bullet = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
-		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
-
-		bulletScript.direction = direction;
-		bulletScript.SetColor(color);
-	}
-
-	// Update Color
-	public void SetColor(Color _color)
-	{
-		GetComponent<Shapes2D.Shape>().settings.fillColor = color = _color;
-	}
-
-	// Photon Instantiate
-	public void OnPhotonInstantiate(PhotonMessageInfo info)
-	{
-		SetColor((Color)(info.photonView.InstantiationData[0]));
+		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = this.color = color;
 	}
 }

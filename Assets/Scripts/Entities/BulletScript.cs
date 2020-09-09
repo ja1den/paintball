@@ -6,37 +6,43 @@ using Photon.Pun;
 public class BulletScript : MonoBehaviour, IPunInstantiateMagicCallback
 {
 	[Header("Movement")]
-	public float speed;
-
-	[Space(10)]
-
-	public Vector2 direction;
+	public Vector2 moveDirection;
+	public float moveSpeed;
 
 	[Header("Appearance")]
 	public Color color;
 
+	[Header("Debug")]
+	private Rigidbody2D rb;
+
+	void Awake()
+	{
+		rb = GetComponent<Rigidbody2D>();
+	}
+
 	void Start()
 	{
 		transform.SetParent(GameObject.Find("Bullets").transform);
-
-		// Lifetime
 		Destroy(gameObject, 10f);
 	}
 
 	void Update()
 	{
-		transform.Translate(direction * speed * Time.deltaTime, Space.World);
+		rb.velocity = moveDirection * moveSpeed;
 	}
 
-	// Update Color
-	public void SetColor(Color _color)
-	{
-		GetComponent<Shapes2D.Shape>().settings.fillColor = color = _color;
-	}
-
-	// Photon Instantiate
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
 	{
 		SetColor((Color)(info.photonView.InstantiationData[0]));
+	}
+
+	void OnCollisionEnter2D(Collision2D col)
+	{
+		Destroy(gameObject);
+	}
+
+	public void SetColor(Color color)
+	{
+		GetComponent<Shapes2D.Shape>().settings.fillColor = this.color = color;
 	}
 }
