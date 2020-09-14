@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class BulletScript : MonoBehaviour, IPunInstantiateMagicCallback
+public class BulletScript : MonoBehaviour
 {
 	[Header("Movement")]
 	public Vector2 moveDirection;
@@ -24,16 +24,8 @@ public class BulletScript : MonoBehaviour, IPunInstantiateMagicCallback
 	{
 		transform.SetParent(GameObject.Find("Bullets").transform);
 		Destroy(gameObject, 10f);
-	}
 
-	void Update()
-	{
 		rb.velocity = moveDirection * moveSpeed;
-	}
-
-	public void OnPhotonInstantiate(PhotonMessageInfo info)
-	{
-		SetColor((Color)(info.photonView.InstantiationData[0]));
 	}
 
 	void OnCollisionEnter2D(Collision2D col)

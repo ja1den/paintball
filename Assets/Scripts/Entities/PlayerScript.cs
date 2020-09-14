@@ -15,6 +15,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	[Header("Weapons")]
 	public GameObject[] weapons;
 
+	[Space(10)]
+
+	public GameObject bulletPrefab;
+
 	[Header("Debug")]
 	[ReadOnly]
 	public Vector2 moveDirection;
@@ -23,7 +27,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Space(10)]
 
-	private RectTransform canvas;
 	private Rigidbody2D rb;
 
 	[Space(10)]
@@ -32,25 +35,23 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	void Awake()
 	{
-		canvas = GameObject.Find("Canvas").GetComponent<RectTransform>();
 		rb = GetComponent<Rigidbody2D>();
 
-		if (transform.Find("Weapon").childCount > 0)
+		// Choose a Random Weapon
+		if (weapons.Length > 0)
 		{
-			weaponScript = transform.Find("Weapon").GetChild(0).GetComponent<WeaponScript>();
+			GameObject weaponPrefab = weapons[Random.Range(0, weapons.Length)];
+
+			GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
+			weapon.transform.SetParent(transform.Find("Weapon"));
+
+			weaponScript = weapon.GetComponent<WeaponScript>();
 		}
 	}
 
 	void Start()
 	{
 		transform.SetParent(GameObject.Find("Players").transform);
-
-		// Choose a Random Weapon
-		if (weapons.Length > 0)
-		{
-			GameObject weaponPrefab = weapons[Random.Range(0, weapons.Length)];
-			weaponPrefab = Instantiate(weaponPrefab, transform.position, Quaternion.identity);
-		}
 	}
 
 	void FixedUpdate()
@@ -79,7 +80,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 		// Look at Cursor
 		Vector2 cursor = context.ReadValue<Vector2>();
-		Vector2 offset = new Vector2(canvas.rect.width, canvas.rect.height) * 0.5f;
+		Vector2 offset = new Vector2(Screen.width, Screen.height) * 0.5f;
 
 		lookDirection = (cursor - offset).normalized;
 
@@ -93,14 +94,24 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Shoot
-		if (weaponScript)
+		if (weaponScript && context.started)
 		{
-			weaponScript.Shoot(lookDirection, color);
+			weaponScript.Shoot(photonView, lookDirection, color);
 		}
 	}
 
 	public void SetColor(Color color)
 	{
 		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = this.color = color;
+	}
+
+	[PunRPC]
+	public void CreateBullet(Vector3 position, Vector2 direction, Color color)
+	{
+		GameObject bullet = Instantiate(bulletPrefab, position, Quaternion.identity);
+		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
+
+		bulletScript.moveDirection = direction;
+		bulletScript.SetColor(color);
 	}
 }

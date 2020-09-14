@@ -5,14 +5,19 @@ using Photon.Pun;
 
 public class RifleScript : WeaponScript
 {
-	public GameObject bulletSpawn;
+	[Header("Attributes")]
+	public float damage = 25f;
+	public float delay = 0.25f;
 
-	public override void CreateBullet(Vector2 direction, Color color)
+	[Header("Debug")]
+	private float prevTime = 0f;
+
+	public override void Shoot(PhotonView photonView, Vector2 direction, Color color)
 	{
-		GameObject bullet = Instantiate(bulletPrefab, bulletSpawn.transform.position, Quaternion.identity);
-		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
-
-		bulletScript.moveDirection = direction;
-		bulletScript.SetColor(color);
+		if (prevTime + delay < Time.time)
+		{
+			photonView.RPC("CreateBullet", RpcTarget.All, transform.Find("Spawn").position, direction, color);
+			prevTime = Time.time;
+		}
 	}
 }
