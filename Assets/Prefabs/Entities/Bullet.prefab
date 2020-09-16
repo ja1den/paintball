@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveDirection: {x: 0, y: 0}
-  moveSpeed: 15
+  moveSpeed: 10
   color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &6960932168484419372
 MonoBehaviour:

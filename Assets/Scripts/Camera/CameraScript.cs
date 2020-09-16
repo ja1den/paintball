@@ -71,10 +71,10 @@ public class CameraScript : MonoBehaviour
 			}
 		}
 
-		if (!vLines.Exists(lineScript => lineScript.position.y == vRound.Item1))
+		if (!vLines.Exists(lineScript => lineScript.position.x == vRound.Item1))
 			SpawnLine(new Vector3(vRound.Item1, 0, 10), Direction.Vertical);
 
-		if (!vLines.Exists(lineScript => lineScript.position.y == vRound.Item2))
+		if (!vLines.Exists(lineScript => lineScript.position.x == vRound.Item2))
 			SpawnLine(new Vector3(vRound.Item2, 0, 10), Direction.Vertical);
 	}
 
