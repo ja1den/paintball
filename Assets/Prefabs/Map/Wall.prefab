@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 2802871748944774609}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
   settings:
     _blur: 0
     _endAngle: 360
-    _fillColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    _fillColor: {r: 0, g: 0, b: 0, a: 1}
     _fillColor2: {r: 0.94509804, g: 0.76862746, b: 0.05882353, a: 1}
     _fillOffset: {x: 0, y: 0}
     _fillPathLoops: 0
@@ -64,8 +64,8 @@ MonoBehaviour:
     _invertArc: 0
     _lineSize: 0.1
     _obsoleteNumSides: -1
-    _outlineColor: {r: 0, g: 0, b: 0, a: 1}
-    _outlineSize: 0.06
+    _outlineColor: {r: 1, g: 1, b: 1, a: 1}
+    _outlineSize: 0
     _pathSegments:
     - p0: {x: -0.3, y: 0, z: 0}
       p1: {x: 0, y: 0, z: 0}

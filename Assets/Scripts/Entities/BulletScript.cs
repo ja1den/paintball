@@ -28,8 +28,13 @@ public class BulletScript : MonoBehaviour
 		rb.velocity = moveDirection * moveSpeed;
 	}
 
-	void OnCollisionEnter2D(Collision2D col)
+	void OnTriggerEnter2D(Collider2D col)
 	{
+		if (LayerMask.Equals(col.gameObject.layer, LayerMask.NameToLayer("Player")))
+		{
+			Debug.Log("Bullet hit Player!");
+		}
+
 		Destroy(gameObject);
 	}
 

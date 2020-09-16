@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6664753038422059477}
   - component: {fileID: 1134061387153476189}
   - component: {fileID: 1134061387153476186}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,7 +260,7 @@ GameObject:
   - component: {fileID: 3163513368724528762}
   - component: {fileID: 1521848940577498030}
   - component: {fileID: 8530628979194157865}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -398,7 +398,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2582475405726129793}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}

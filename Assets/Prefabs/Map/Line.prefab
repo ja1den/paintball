@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4291582948068865895}
   - component: {fileID: 4291582948068865892}
   - component: {fileID: 4291582948068865893}
-  - component: {fileID: 2914666294230857797}
+  - component: {fileID: 4751288581398980243}
   m_Layer: 0
   m_Name: Line
   m_TagString: Untagged
@@ -27,8 +27,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4291582948068865890}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
   settings:
     _blur: 0
     _endAngle: 360
-    _fillColor: {r: 0.98039216, g: 0.98039216, b: 0.98039216, a: 1}
+    _fillColor: {r: 0, g: 0, b: 0, a: 0.019607844}
     _fillColor2: {r: 0.94509804, g: 0.76862746, b: 0.05882353, a: 1}
     _fillOffset: {x: 0, y: 0}
     _fillPathLoops: 0
@@ -141,7 +141,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2914666294230857797
+--- !u!114 &4751288581398980243
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -153,3 +153,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48df592889fb7aa4fa609c39e2419941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  direction: 1
