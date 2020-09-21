@@ -121,7 +121,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!21 &21091475
+--- !u!21 &240688954
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -496,7 +496,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 21091475}
+  - {fileID: 240688954}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -598,6 +598,7 @@ GameObject:
   - component: {fileID: 1016846531}
   - component: {fileID: 1016846530}
   - component: {fileID: 1016846532}
+  - component: {fileID: 1016846533}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -688,6 +689,20 @@ MonoBehaviour:
   spacing: 1
   hLines: []
   vLines: []
+--- !u!114 &1016846533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016846528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fdd66bf060aa3140859ce20bb5f0eb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linePrefab: {fileID: 4291582948068865890, guid: 8cdb15b110560804294dc921f2325d91,
+    type: 3}
 --- !u!1 &1050675482
 GameObject:
   m_ObjectHideFlags: 0
