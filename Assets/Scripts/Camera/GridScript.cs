@@ -61,6 +61,7 @@ public class GridScript : MonoBehaviour
 					if (key.Item1 < hRound.Item1 - 1 || hRound.Item2 + 1 < key.Item1)
 					{
 						linesToRemove.Add((key, line));
+						continue;
 					}
 
 					// Follow Camera
@@ -75,6 +76,7 @@ public class GridScript : MonoBehaviour
 					if (key.Item1 < vRound.Item1 - 1 || vRound.Item2 + 1 < key.Item1)
 					{
 						linesToRemove.Add((key, line));
+						continue;
 					}
 
 					// Follow Camera

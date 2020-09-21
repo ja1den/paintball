@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
 
 		// Validate
 		if (colors.Length == 0) throw new System.ArgumentException("Array cannot be empty", "colors");
+
+
 	}
 
 	void Start()

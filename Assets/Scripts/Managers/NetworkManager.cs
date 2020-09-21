@@ -9,32 +9,24 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
 	void Awake()
 	{
+		// Photon Config
 		PhotonNetwork.AutomaticallySyncScene = true;
-
-		// Custom Types
 		Paintball.CustomTypes.Register();
 	}
 
 	void Start()
 	{
-		// Connect to Photon
 		PhotonNetwork.ConnectUsingSettings();
 		PhotonNetwork.GameVersion = Application.version;
 	}
 
 	public override void OnConnectedToMaster()
 	{
-		Debug.Log("Connected to Photon");
-
-		// Join a Random Room
 		PhotonNetwork.JoinRandomRoom();
 	}
 
 	public override void OnJoinedRoom()
 	{
-		Debug.Log("Joined a Room");
-
-		// Load the Game Scene
 		if (PhotonNetwork.IsMasterClient)
 		{
 			PhotonNetwork.LoadLevel("GameScene");
@@ -43,16 +35,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	public override void OnJoinRandomFailed(short returnCode, string message)
 	{
-		Debug.Log("Random Join Failed");
-
-		// Create a new Room
 		PhotonNetwork.CreateRoom(null, new RoomOptions());
 	}
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
-		Debug.LogWarningFormat($"Disconnected from Photon: {cause}");
+		SceneManager.LoadScene("LoadScene", LoadSceneMode.Single);
+		DestroyImmediate(gameObject);
 	}
-
-
 }
