@@ -201,6 +201,10 @@ MonoBehaviour:
   - {r: 0.9725491, g: 0.90196085, b: 0.57254905, a: 1}
   - {r: 0.7176471, g: 0.9803922, b: 0.58431375, a: 1}
   - {r: 0.5882353, g: 0.9803922, b: 0.9725491, a: 1}
+  weapons:
+  - {fileID: 8860478186319290133, guid: 0b17100b9b6e3c44898964deba3b9ad5, type: 3}
+  - {fileID: 2439212513752825163, guid: 0d87f07e37b202a4eac96be4f7cf06ce, type: 3}
+  - {fileID: 8860478186319290133, guid: d4f6ff47ff05c6f40ad09dc418ceedd8, type: 3}
 --- !u!1 &454117433
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,7 +415,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1719493907}
+  - {fileID: 1757092642}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -837,7 +841,7 @@ Transform:
   m_Father: {fileID: 1197364192}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1719493907
+--- !u!21 &1757092642
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0

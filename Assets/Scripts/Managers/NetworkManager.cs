@@ -40,7 +40,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
-		SceneManager.LoadScene("LoadScene", LoadSceneMode.Single);
-		DestroyImmediate(gameObject);
+		StartCoroutine(HandleDisconnect());
+	}
+
+	IEnumerator HandleDisconnect()
+	{
+		yield return new WaitForSeconds(1);
+
+		if (Application.isPlaying)
+		{
+			SceneManager.LoadScene("LoadScene", LoadSceneMode.Single);
+			DestroyImmediate(gameObject);
+		}
 	}
 }
