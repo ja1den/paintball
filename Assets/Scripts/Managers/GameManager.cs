@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
 
 	[Header("Appearance")]
 	public Color[] colors;
+
+	[Header("Weapons")]
+	public GameObject[] weapons;
 
 	void Awake()
 	{
@@ -28,7 +31,7 @@ public class GameManager : MonoBehaviour
 	void Start()
 	{
 		// Spawn a Player
-		object[] playerData = new object[] { colors[Random.Range(0, colors.Length)] };
+		object[] playerData = new object[] { colors[Random.Range(0, colors.Length)], Random.Range(0, weapons.Length) };
 		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0, 0, 0), Quaternion.identity, 0, playerData);
 
 		// Assign the Camera

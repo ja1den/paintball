@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class RifleScript : WeaponScript
+public class SniperScript : WeaponScript
 {
 	[Header("Attributes")]
-	public float damage = 25f;
-	public float delay = 0.25f;
+	public float damage = 125f;
+	public float delay = 1.25f;
 
 	[Header("Debug")]
 	private float prevTime = 0f;
@@ -16,7 +16,7 @@ public class RifleScript : WeaponScript
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, transform.Find("Spawn").position, direction, color);
+			photonView.RPC("CreateBullet", RpcTarget.All, transform.Find("Spawn").position, direction, color, 0.5f);
 			prevTime = Time.time;
 		}
 	}

@@ -54,10 +54,11 @@ MonoBehaviour:
   color: {r: 0, g: 0, b: 0, a: 0}
   weapons:
   - {fileID: 8860478186319290133, guid: 0b17100b9b6e3c44898964deba3b9ad5, type: 3}
+  - {fileID: 2439212513752825163, guid: 0d87f07e37b202a4eac96be4f7cf06ce, type: 3}
+  - {fileID: 8860478186319290133, guid: d4f6ff47ff05c6f40ad09dc418ceedd8, type: 3}
   bulletPrefab: {fileID: 6960932168484419361, guid: 7829770e966fa3a48addd852a7b6b8b0,
     type: 3}
-  moveDirection: {x: 0, y: 0}
-  lookDirection: {x: 0, y: 0}
+  isShooting: 0
 --- !u!114 &1134061387153476188
 MonoBehaviour:
   m_ObjectHideFlags: 0

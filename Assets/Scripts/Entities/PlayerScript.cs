@@ -14,16 +14,15 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Header("Weapons")]
 	public GameObject[] weapons;
+	public GameObject bulletPrefab;
 
 	[Space(10)]
 
-	public GameObject bulletPrefab;
+	public bool isShooting = false;
 
 	[Header("Debug")]
-	[ReadOnly]
-	public Vector2 moveDirection;
-	[ReadOnly]
-	public Vector2 lookDirection;
+	private Vector2 moveDirection;
+	private Vector2 lookDirection;
 
 	[Space(10)]
 
@@ -36,17 +35,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
-
-		// Choose a Random Weapon
-		if (weapons.Length > 0)
-		{
-			GameObject weaponPrefab = weapons[Random.Range(0, weapons.Length)];
-
-			GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
-			weapon.transform.SetParent(transform.Find("Weapon"));
-
-			weaponScript = weapon.GetComponent<WeaponScript>();
-		}
 	}
 
 	void Start()
@@ -57,11 +45,28 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	void FixedUpdate()
 	{
 		rb.velocity = moveDirection * moveSpeed;
+
+		if (weaponScript && isShooting)
+		{
+			weaponScript.Shoot(photonView, lookDirection, color);
+		}
 	}
 
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
 	{
+		// Color
 		SetColor((Color)(info.photonView.InstantiationData[0]));
+
+		// Weapon
+		if (weapons.Length > 0)
+		{
+			GameObject weaponPrefab = weapons[(int)info.photonView.InstantiationData[1]];
+
+			GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
+			weapon.transform.SetParent(transform.Find("Weapon"));
+
+			weaponScript = weapon.GetComponent<WeaponScript>();
+		}
 	}
 
 	public void Move(InputAction.CallbackContext context)
@@ -93,10 +98,16 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-		// Shoot
-		if (weaponScript && context.started)
+		// Toggle Shooting
+		switch (context.phase)
 		{
-			weaponScript.Shoot(photonView, lookDirection, color);
+			case InputActionPhase.Started:
+				isShooting = true;
+				break;
+
+			case InputActionPhase.Canceled:
+				isShooting = false;
+				break;
 		}
 	}
 
@@ -106,11 +117,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	}
 
 	[PunRPC]
-	public void CreateBullet(Vector3 position, Vector2 direction, Color color)
+	public void CreateBullet(Vector3 position, Vector2 direction, Color color, float size)
 	{
 		GameObject bullet = Instantiate(bulletPrefab, position, Quaternion.identity);
-		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
+		bullet.transform.localScale = new Vector3(size, size, 1);
 
+		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
 		bulletScript.moveDirection = direction;
 		bulletScript.SetColor(color);
 	}
