@@ -9,8 +9,8 @@ public class GameManager : MonoBehaviour
 	[Header("GameObjects")]
 	public GameObject playerPrefab;
 
-	[Header("Appearance")]
-	public Color[] colors;
+	[Header("Teams")]
+	public Color[] teams;
 
 	[Header("Weapons")]
 	public GameObject[] weapons;
@@ -25,13 +25,13 @@ public class GameManager : MonoBehaviour
 		}
 
 		// Validate
-		if (colors.Length == 0) throw new System.ArgumentException("Array cannot be empty", "colors");
+		if (teams.Length == 0) throw new System.ArgumentException("Array cannot be empty", "teams");
 	}
 
 	void Start()
 	{
 		// Spawn a Player
-		object[] playerData = new object[] { colors[Random.Range(0, colors.Length)], Random.Range(0, weapons.Length) };
+		object[] playerData = new object[] { Random.Range(0, teams.Length), Random.Range(0, weapons.Length) };
 		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0, 0, 0), Quaternion.identity, 0, playerData);
 
 		// Assign the Camera

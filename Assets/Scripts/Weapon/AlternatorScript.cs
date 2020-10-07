@@ -6,7 +6,7 @@ using Photon.Pun;
 public class AlternatorScript : WeaponScript
 {
 	[Header("Attributes")]
-	public float damage = 10f;
+	public int damage = 10;
 	public float delay = 0.1f;
 
 	[Header("Debug")]
@@ -16,11 +16,11 @@ public class AlternatorScript : WeaponScript
 
 	private int spawn = 0;
 
-	public override void Shoot(PhotonView photonView, Vector2 direction, Color color)
+	public override void Shoot(PhotonView photonView, Vector2 direction, int team, Color color)
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, transform.Find($"Spawn {spawn + 1}").position, direction, color, 0.3f);
+			photonView.RPC("CreateBullet", RpcTarget.All, photonView.ViewID, transform.Find($"Spawn {spawn + 1}").position, direction, team, damage, 0.3f, color);
 			prevTime = Time.time;
 
 			spawn = 1 - spawn;

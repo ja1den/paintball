@@ -6,17 +6,17 @@ using Photon.Pun;
 public class SniperScript : WeaponScript
 {
 	[Header("Attributes")]
-	public float damage = 125f;
+	public int damage = 125;
 	public float delay = 1.25f;
 
 	[Header("Debug")]
 	private float prevTime = 0f;
 
-	public override void Shoot(PhotonView photonView, Vector2 direction, Color color)
+	public override void Shoot(PhotonView photonView, Vector2 direction, int team, Color color)
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, transform.Find("Spawn").position, direction, color, 0.5f);
+			photonView.RPC("CreateBullet", RpcTarget.All, photonView.ViewID, transform.Find("Spawn").position, direction, team, damage, 0.45f, color);
 			prevTime = Time.time;
 		}
 	}

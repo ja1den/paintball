@@ -6,8 +6,19 @@ using Photon.Pun;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
+	[Header("Control")]
+	public int team;
+
 	[Header("Movement")]
-	public float moveSpeed;
+	public float speed;
+
+	[Header("Health")]
+	public int health;
+
+	[Space(10)]
+
+	public int zoneDamage = 20;
+	public float prevTime = 0f;
 
 	[Header("Appearance")]
 	public Color color;
@@ -21,8 +32,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	public bool isShooting = false;
 
 	[Header("Debug")]
-	private Vector2 moveDirection;
-	private Vector2 lookDirection;
+	private GameManager gameManager;
+	private Vector2 zone;
 
 	[Space(10)]
 
@@ -30,32 +41,56 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Space(10)]
 
+	private Vector2 moveDirection;
+	private Vector2 lookDirection;
+
+	[Space(10)]
+
 	private WeaponScript weaponScript;
+	private GameObject weaponParent;
 
 	void Awake()
 	{
+		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+		zone = GameObject.Find("Map").transform.localScale;
+
 		rb = GetComponent<Rigidbody2D>();
+
+		weaponParent = transform.Find("Weapon").gameObject;
 	}
 
 	void Start()
 	{
+		transform.position = new Vector3(0, 0, -photonView.OwnerActorNr);
 		transform.SetParent(GameObject.Find("Players").transform);
 	}
 
 	void FixedUpdate()
 	{
-		rb.velocity = moveDirection * moveSpeed;
+		// Movement
+		rb.velocity = moveDirection * speed;
 
+		// Shoot
 		if (weaponScript && isShooting)
 		{
-			weaponScript.Shoot(photonView, lookDirection, color);
+			weaponScript.Shoot(photonView, lookDirection, team, color);
+		}
+
+		// Zone Tick
+		if (transform.position.x < -zone.x / 2 || zone.x / 2 < transform.position.x || transform.position.y < -zone.y / 2 || zone.y / 2 < transform.position.y)
+		{
+			if (prevTime + 0.5f < Time.time)
+			{
+				if (photonView.IsMine) photonView.RPC("Damage", RpcTarget.All, zoneDamage);
+				prevTime = Time.time;
+			}
 		}
 	}
 
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
 	{
 		// Color
-		SetColor((Color)(info.photonView.InstantiationData[0]));
+		SetTeam((int)info.photonView.InstantiationData[0]);
 
 		// Weapon
 		if (weapons.Length > 0)
@@ -63,7 +98,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			GameObject weaponPrefab = weapons[(int)info.photonView.InstantiationData[1]];
 
 			GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
-			weapon.transform.SetParent(transform.Find("Weapon"));
+			weapon.transform.SetParent(weaponParent.transform);
 
 			weaponScript = weapon.GetComponent<WeaponScript>();
 		}
@@ -90,7 +125,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		lookDirection = (cursor - offset).normalized;
 
 		float angle = Vector2.SignedAngle(Vector2.up, lookDirection);
-		transform.rotation = Quaternion.Euler(0, 0, angle);
+		weaponParent.transform.rotation = Quaternion.Euler(0, 0, angle);
 	}
 
 	public void Fire(InputAction.CallbackContext context)
@@ -111,19 +146,29 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		}
 	}
 
-	public void SetColor(Color color)
+	public void SetTeam(int team)
 	{
-		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = this.color = color;
+		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[this.team = team];
 	}
 
 	[PunRPC]
-	public void CreateBullet(Vector3 position, Vector2 direction, Color color, float size)
+	public int Damage(int damage)
+	{
+		return health = Mathf.Max(0, health - damage);
+	}
+
+	[PunRPC]
+	public void CreateBullet(int owner, Vector3 position, Vector2 direction, int team, int damage, float size, Color color)
 	{
 		GameObject bullet = Instantiate(bulletPrefab, position, Quaternion.identity);
 		bullet.transform.localScale = new Vector3(size, size, 1);
 
 		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
+
+		bulletScript.SetTeam(team);
+		bulletScript.owner = owner;
+
 		bulletScript.moveDirection = direction;
-		bulletScript.SetColor(color);
+		bulletScript.damage = damage;
 	}
 }
