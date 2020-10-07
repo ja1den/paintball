@@ -54,6 +54,8 @@ MonoBehaviour:
   team: 0
   speed: 5
   health: 200
+  zoneDamage: 20
+  prevTime: 0
   color: {r: 0, g: 0, b: 0, a: 1}
   weapons:
   - {fileID: 8860478186319290133, guid: 0b17100b9b6e3c44898964deba3b9ad5, type: 3}
