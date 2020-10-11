@@ -5,8 +5,18 @@ using TMPro;
 
 public class FrameScript : MonoBehaviour
 {
-	void FixedUpdate()
+	[Header("Control")]
+	public float delay = 1f;
+
+	[Header("Debug")]
+	private float prevTime = 0f;
+
+	void Update()
 	{
-		GetComponent<TMP_Text>().text = (1 / Time.deltaTime).ToString();
+		if (prevTime + delay < Time.time)
+		{
+			GetComponent<TMP_Text>().text = Mathf.RoundToInt(1f / Time.deltaTime).ToString();
+			prevTime = Time.time;
+		}
 	}
 }
