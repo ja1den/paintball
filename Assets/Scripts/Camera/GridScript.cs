@@ -4,87 +4,71 @@ using UnityEngine;
 
 public class GridScript : MonoBehaviour
 {
-	[Header("Grid")]
+	[Header("GameObjects")]
 	public GameObject linePrefab;
 
 	[Header("Debug")]
 	private Dictionary<(int, Direction), GameObject> lines =
 		new Dictionary<(int, Direction), GameObject>();
 
-	public enum Direction
-	{
-		Horizontal,
-		Vertical
-	}
+	public enum Direction { H, V }
 
 	void Start()
 	{
-		// Camera Bounds
-		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-		Vector3 topRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-
-		(int, int) hRound = (Mathf.FloorToInt(bottomLeft.y), Mathf.CeilToInt(topRight.y));
-		(int, int) vRound = (Mathf.FloorToInt(bottomLeft.x), Mathf.CeilToInt(topRight.x));
+		// Screen to World Space
+		RectInt screen = ScreenRect(Camera.main);
 
 		// Horizontal Lines
-		for (int i = hRound.Item1; i < hRound.Item2; i++)
-			SpawnLine(i, Direction.Horizontal);
+		for (int i = screen.yMin; i < screen.yMax; i++)
+			SpawnLine(i, Direction.H);
 
 		// Vertical Lines
-		for (int i = vRound.Item1; i < vRound.Item2; i++)
-			SpawnLine(i, Direction.Vertical);
+		for (int i = screen.xMin; i < screen.xMax; i++)
+			SpawnLine(i, Direction.V);
 	}
 
 	void Update()
 	{
-		// Camera Bounds
-		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-		Vector3 topRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+		// Screen to World Space
+		RectInt screen = ScreenRect(Camera.main);
 
-		(int, int) hRound = (Mathf.FloorToInt(bottomLeft.y), Mathf.CeilToInt(topRight.y));
-		(int, int) vRound = (Mathf.FloorToInt(bottomLeft.x), Mathf.CeilToInt(topRight.x));
+		// Horizontal Lines
+		for (int i = screen.yMin - 1; i <= screen.yMax + 1; i++)
+		{
+			// Spawn a Line
+			if (!lines.TryGetValue((i, Direction.H), out GameObject line))
+				line = SpawnLine(i, Direction.H);
+
+			// Follow Camera
+			line.transform.position = new Vector3(screen.center.x, line.transform.position.y, 10);
+			line.transform.localScale = new Vector3(screen.size.x, 0.1f, 1);
+		}
+
+		// Vertical Lines
+		for (int i = screen.xMin - 1; i <= screen.xMax + 1; i++)
+		{
+			// Spawn a Line
+			if (!lines.TryGetValue((i, Direction.V), out GameObject line))
+				line = SpawnLine(i, Direction.V);
+
+			// Follow Camera
+			line.transform.position = new Vector3(line.transform.position.x, screen.center.y, 10);
+			line.transform.localScale = new Vector3(0.1f, screen.size.y, 1);
+		}
 
 		// Lines to Remove
 		List<((int, Direction), GameObject)> linesToRemove = new List<((int, Direction), GameObject)>();
 
-		// Update Lines
+		// Find Lines
 		foreach (KeyValuePair<(int, Direction), GameObject> entry in lines)
 		{
-			(int, Direction) key = entry.Key;
-			GameObject line = entry.Value;
+			if (entry.Key.Item2 == Direction.H)
+				if (entry.Key.Item1 < screen.yMin - 1 || screen.yMax + 1 < entry.Key.Item1)
+					linesToRemove.Add((entry.Key, entry.Value));
 
-			switch (key.Item2)
-			{
-				case Direction.Horizontal:
-
-					// Destroy
-					if (key.Item1 < hRound.Item1 - 1 || hRound.Item2 + 1 < key.Item1)
-					{
-						linesToRemove.Add((key, line));
-						continue;
-					}
-
-					// Follow Camera
-					line.transform.position = new Vector3(Camera.main.transform.position.x, line.transform.position.y, 10);
-					line.transform.localScale = new Vector3(Camera.main.orthographicSize * 2 * Camera.main.aspect, 0.1f, 1);
-
-					break;
-
-				case Direction.Vertical:
-
-					// Destroy
-					if (key.Item1 < vRound.Item1 - 1 || vRound.Item2 + 1 < key.Item1)
-					{
-						linesToRemove.Add((key, line));
-						continue;
-					}
-
-					// Follow Camera
-					line.transform.position = new Vector3(line.transform.position.x, Camera.main.transform.position.y, 10);
-					line.transform.localScale = new Vector3(0.1f, Camera.main.orthographicSize * 2, 1);
-
-					break;
-			}
+			if (entry.Key.Item2 == Direction.V)
+				if (entry.Key.Item1 < screen.xMin - 1 || screen.xMax + 1 < entry.Key.Item1)
+					linesToRemove.Add((entry.Key, entry.Value));
 		}
 
 		// Destroy Lines
@@ -93,24 +77,11 @@ public class GridScript : MonoBehaviour
 			lines.Remove(entry.Item1);
 			Destroy(entry.Item2);
 		}
-
-		// Spawn Lines
-		if (!lines.ContainsKey((hRound.Item1, Direction.Horizontal)))
-			SpawnLine(hRound.Item1, Direction.Horizontal);
-
-		if (!lines.ContainsKey((hRound.Item2, Direction.Horizontal)))
-			SpawnLine(hRound.Item2, Direction.Horizontal);
-
-		if (!lines.ContainsKey((vRound.Item1, Direction.Vertical)))
-			SpawnLine(vRound.Item1, Direction.Vertical);
-
-		if (!lines.ContainsKey((vRound.Item2, Direction.Vertical)))
-			SpawnLine(vRound.Item2, Direction.Vertical);
 	}
 
-	void SpawnLine(int position, Direction direction)
+	GameObject SpawnLine(int position, Direction direction)
 	{
-		Vector3 spawn = direction == Direction.Horizontal ?
+		Vector3 spawn = direction == Direction.H ?
 			new Vector3(0, position, 10) :
 			new Vector3(position, 0, 10);
 
@@ -118,5 +89,18 @@ public class GridScript : MonoBehaviour
 		line.transform.SetParent(GameObject.Find("Grid").transform);
 
 		lines.Add((position, direction), line);
+		return line;
+	}
+
+	RectInt ScreenRect(Camera camera)
+	{
+		RectInt rect = new RectInt();
+
+		Vector3 min = camera.ScreenToWorldPoint(new Vector3(camera.rect.xMin * camera.pixelWidth, camera.rect.yMin * camera.pixelHeight, 0));
+		Vector3 max = camera.ScreenToWorldPoint(new Vector3(camera.rect.xMax * camera.pixelWidth, camera.rect.yMax * camera.pixelHeight, 0));
+
+		rect.SetMinMax(new Vector2Int(Mathf.FloorToInt(min.x), Mathf.FloorToInt(min.y)), new Vector2Int(Mathf.CeilToInt(max.x), Mathf.CeilToInt(max.y)));
+
+		return rect;
 	}
 }
