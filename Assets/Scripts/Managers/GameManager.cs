@@ -4,13 +4,20 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 
+[System.Serializable]
+public struct Team
+{
+	public GameObject spawn;
+	public Color color;
+}
+
 public class GameManager : MonoBehaviour
 {
 	[Header("GameObjects")]
 	public GameObject playerPrefab;
 
 	[Header("Teams")]
-	public Color[] teams;
+	public Team[] teams;
 
 	[Header("Weapons")]
 	public GameObject[] weapons;
@@ -30,9 +37,12 @@ public class GameManager : MonoBehaviour
 
 	void Start()
 	{
+		// Player Data
+		int team = Random.Range(0, teams.Length);
+
 		// Spawn a Player
-		object[] playerData = new object[] { Random.Range(0, teams.Length), Random.Range(0, weapons.Length) };
-		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0, 0, 0), Quaternion.identity, 0, playerData);
+		object[] playerData = new object[] { team, Random.Range(0, weapons.Length) };
+		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, teams[team].spawn.transform.position, Quaternion.identity, 0, playerData);
 
 		// Assign the Camera
 		Camera.main.GetComponent<CameraScript>().target = player;

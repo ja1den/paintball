@@ -9,6 +9,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	[Header("Control")]
 	public int team;
 
+	[Space(10)]
+
+	public bool isRespawning = false;
+	public float respawn = 0;
+
 	[Header("Movement")]
 	public float speed;
 
@@ -46,6 +51,10 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Space(10)]
 
+	private int maxHealth;
+
+	[Space(10)]
+
 	private WeaponScript weaponScript;
 
 	[HideInInspector]
@@ -57,18 +66,20 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		zone = GameObject.Find("Background").transform.localScale;
 
 		rb = GetComponent<Rigidbody2D>();
+
+		transform.Find("Health").GetComponent<HealthScript>().maxHealth = maxHealth = health;
 	}
 
 	void Start()
 	{
-		transform.position = new Vector3(0, 0, -photonView.OwnerActorNr);
+		transform.position += new Vector3(0, 0, -photonView.OwnerActorNr);
 		transform.SetParent(GameObject.Find("Players").transform);
 	}
 
 	void FixedUpdate()
 	{
 		// Movement
-		rb.velocity = moveDirection * speed;
+		if (!isRespawning) rb.velocity = moveDirection * speed;
 
 		// Shoot
 		if (weaponScript && isShooting) weaponScript.Shoot(this, lookDirection);
@@ -81,6 +92,20 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 				if (photonView.IsMine) photonView.RPC("Damage", RpcTarget.All, zoneDamage);
 				prevTime = Time.time;
 			}
+		}
+
+		// Respawn
+		if (isRespawning && respawn + 5f < Time.time)
+		{
+			// Show Sprites
+			foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
+				spriteRenderer.enabled = true;
+
+			// Enable Collider
+			GetComponent<CircleCollider2D>().enabled = true;
+
+			// Reset
+			isRespawning = false;
 		}
 	}
 
@@ -115,6 +140,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
+		// Respawning
+		if (isRespawning) return;
+
 		// Look at Cursor
 		Vector2 cursor = context.ReadValue<Vector2>();
 		Vector2 offset = new Vector2(Screen.width, Screen.height) * 0.5f;
@@ -129,6 +157,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	{
 		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
+		// Respawning
+		if (isRespawning) return;
 
 		// Toggle Shooting
 		switch (context.phase)
@@ -145,13 +176,33 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	public void SetTeam(int team)
 	{
-		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[this.team = team];
+		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[this.team = team].color;
 	}
 
 	[PunRPC]
 	public int Damage(int damage)
 	{
-		return health = Mathf.Max(0, health - damage);
+		health = Mathf.Max(0, health - damage);
+
+		if (health == 0)
+		{
+			// Reset Player
+			transform.position = gameManager.teams[team].spawn.transform.position;
+			health = maxHealth;
+
+			// Hide Sprites
+			foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
+				spriteRenderer.enabled = false;
+
+			// Disable Collider
+			GetComponent<CircleCollider2D>().enabled = false;
+
+			// Respawn
+			isRespawning = true;
+			respawn = Time.time;
+		}
+
+		return health;
 	}
 
 	[PunRPC]
@@ -173,9 +224,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	public void DestroyBullet(int owner, int number)
 	{
 		foreach (BulletScript bulletScript in FindObjectsOfType<BulletScript>())
-		{
 			if (bulletScript.owner.photonView.ViewID == owner && bulletScript.number == number)
 				Destroy(bulletScript.gameObject);
-		}
 	}
 }

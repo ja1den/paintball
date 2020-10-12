@@ -32,12 +32,24 @@ public class BulletScript : MonoBehaviourPunCallbacks
 		rb = GetComponent<Rigidbody2D>();
 	}
 
-	void Start()
+	IEnumerator Start()
 	{
-		GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[owner.team];
+		GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[owner.team].color;
 		transform.SetParent(GameObject.Find("Bullets").transform);
 
 		rb.velocity = moveDirection * moveSpeed;
+
+		yield return new WaitForSeconds(10f);
+
+		if (owner != null)
+		{
+			if (owner.photonView.IsMine)
+				owner.photonView.RPC("DestroyBullet", RpcTarget.All, owner.photonView.ViewID, number);
+		}
+		else
+		{
+			Destroy(gameObject);
+		}
 	}
 
 	void OnTriggerEnter2D(Collider2D col)

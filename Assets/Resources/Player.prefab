@@ -52,6 +52,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 0
+  isRespawning: 0
+  respawn: 0
   speed: 5
   health: 200
   zoneDamage: 20
@@ -64,6 +66,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 6960932168484419361, guid: 7829770e966fa3a48addd852a7b6b8b0,
     type: 3}
   isShooting: 0
+  bulletCount: 0
 --- !u!114 &1134061387153476188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,7 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3001343e26a89f47b0493c8f54e55e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 200
+  maxHealth: 0
 --- !u!1 &3926991158050026307
 GameObject:
   m_ObjectHideFlags: 0
