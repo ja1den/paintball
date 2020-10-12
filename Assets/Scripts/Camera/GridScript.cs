@@ -40,7 +40,7 @@ public class GridScript : MonoBehaviour
 				line = SpawnLine(i, Direction.H);
 
 			// Follow Camera
-			line.transform.position = new Vector3(screen.center.x, line.transform.position.y, 10);
+			line.transform.position = new Vector3(screen.center.x, line.transform.position.y, line.transform.position.z);
 			line.transform.localScale = new Vector3(screen.size.x, 0.1f, 1);
 		}
 
@@ -52,7 +52,7 @@ public class GridScript : MonoBehaviour
 				line = SpawnLine(i, Direction.V);
 
 			// Follow Camera
-			line.transform.position = new Vector3(line.transform.position.x, screen.center.y, 10);
+			line.transform.position = new Vector3(line.transform.position.x, screen.center.y, line.transform.position.z);
 			line.transform.localScale = new Vector3(0.1f, screen.size.y, 1);
 		}
 
@@ -81,12 +81,14 @@ public class GridScript : MonoBehaviour
 
 	GameObject SpawnLine(int position, Direction direction)
 	{
+		Transform gridParent = GameObject.Find("Grid").transform;
+
 		Vector3 spawn = direction == Direction.H ?
-			new Vector3(0, position, 10) :
-			new Vector3(position, 0, 10);
+			new Vector3(0, position, gridParent.position.z) :
+			new Vector3(position, 0, gridParent.position.z);
 
 		GameObject line = Instantiate(linePrefab, spawn, Quaternion.identity);
-		line.transform.SetParent(GameObject.Find("Grid").transform);
+		line.transform.SetParent(gridParent, true);
 
 		lines.Add((position, direction), line);
 		return line;

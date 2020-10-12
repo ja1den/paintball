@@ -52,7 +52,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	void Awake()
 	{
 		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-		zone = GameObject.Find("Map").transform.localScale;
+		zone = GameObject.Find("Background").transform.localScale;
 
 		rb = GetComponent<Rigidbody2D>();
 

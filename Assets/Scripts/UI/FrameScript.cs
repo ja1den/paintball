@@ -9,14 +9,28 @@ public class FrameScript : MonoBehaviour
 	public float delay = 1f;
 
 	[Header("Debug")]
-	private float prevTime = 0f;
+	private float prevTime;
+	private int frames;
+
+	void Awake()
+	{
+		prevTime = Time.time;
+	}
+
+	void Start()
+	{
+		GetComponent<TMP_Text>().text = Mathf.RoundToInt(1f / Time.deltaTime).ToString();
+	}
 
 	void Update()
 	{
 		if (prevTime + delay < Time.time)
 		{
-			GetComponent<TMP_Text>().text = Mathf.RoundToInt(1f / Time.deltaTime).ToString();
+			GetComponent<TMP_Text>().text = frames.ToString();
+
 			prevTime = Time.time;
+			frames = 0;
 		}
+		else frames++;
 	}
 }
