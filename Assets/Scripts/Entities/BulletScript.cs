@@ -6,8 +6,8 @@ using Photon.Pun;
 public class BulletScript : MonoBehaviourPunCallbacks
 {
 	[Header("Control")]
-	public int owner;
-	public int team;
+	public PlayerScript owner;
+	public int number;
 
 	[Header("Health")]
 	public int damage;
@@ -34,8 +34,8 @@ public class BulletScript : MonoBehaviourPunCallbacks
 
 	void Start()
 	{
+		GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[owner.team];
 		transform.SetParent(GameObject.Find("Bullets").transform);
-		Destroy(gameObject, 10f);
 
 		rb.velocity = moveDirection * moveSpeed;
 	}
@@ -45,17 +45,12 @@ public class BulletScript : MonoBehaviourPunCallbacks
 		if (LayerMask.Equals(col.gameObject.layer, LayerMask.NameToLayer("Player")))
 		{
 			PlayerScript playerScript = col.gameObject.GetComponent<PlayerScript>();
-			PhotonView photonView = PhotonNetwork.GetPhotonView(owner);
 
-			if (playerScript.team != team && photonView.IsMine)
+			if (playerScript.team != owner.team && owner.photonView.IsMine)
 				playerScript.photonView.RPC("Damage", RpcTarget.All, damage);
 		}
 
-		Destroy(gameObject);
-	}
-
-	public void SetTeam(int team)
-	{
-		GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[this.team = team];
+		if (owner.photonView.IsMine)
+			owner.photonView.RPC("DestroyBullet", RpcTarget.All, owner.photonView.ViewID, number);
 	}
 }

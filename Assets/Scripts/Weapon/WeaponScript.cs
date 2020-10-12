@@ -5,5 +5,5 @@ using Photon.Pun;
 
 public abstract class WeaponScript : MonoBehaviourPunCallbacks
 {
-	public abstract void Shoot(PhotonView photonView, Vector2 direction, int team, Color color);
+	public abstract void Shoot(PlayerScript playerScript, Vector2 direction);
 }

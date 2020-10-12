@@ -47,7 +47,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	[Space(10)]
 
 	private WeaponScript weaponScript;
-	private GameObject weaponParent;
+
+	[HideInInspector]
+	public int bulletCount = 0;
 
 	void Awake()
 	{
@@ -55,8 +57,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		zone = GameObject.Find("Background").transform.localScale;
 
 		rb = GetComponent<Rigidbody2D>();
-
-		weaponParent = transform.Find("Weapon").gameObject;
 	}
 
 	void Start()
@@ -71,10 +71,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		rb.velocity = moveDirection * speed;
 
 		// Shoot
-		if (weaponScript && isShooting)
-		{
-			weaponScript.Shoot(photonView, lookDirection, team, color);
-		}
+		if (weaponScript && isShooting) weaponScript.Shoot(this, lookDirection);
 
 		// Zone Tick
 		if (transform.position.x < -zone.x / 2 || zone.x / 2 < transform.position.x || transform.position.y < -zone.y / 2 || zone.y / 2 < transform.position.y)
@@ -98,7 +95,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			GameObject weaponPrefab = weapons[(int)info.photonView.InstantiationData[1]];
 
 			GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
-			weapon.transform.SetParent(weaponParent.transform);
+			weapon.transform.SetParent(transform.Find("Weapon"));
 
 			weaponScript = weapon.GetComponent<WeaponScript>();
 		}
@@ -125,7 +122,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		lookDirection = (cursor - offset).normalized;
 
 		float angle = Vector2.SignedAngle(Vector2.up, lookDirection);
-		weaponParent.transform.rotation = Quaternion.Euler(0, 0, angle);
+		weaponScript.transform.parent.transform.rotation = Quaternion.Euler(0, 0, angle);
 	}
 
 	public void Fire(InputAction.CallbackContext context)
@@ -158,17 +155,27 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	}
 
 	[PunRPC]
-	public void CreateBullet(int owner, Vector3 position, Vector2 direction, int team, int damage, float size, Color color)
+	public void CreateBullet(int owner, int number, Vector3 position, Vector2 direction, int damage, float size)
 	{
 		GameObject bullet = Instantiate(bulletPrefab, position, Quaternion.identity);
 		bullet.transform.localScale = new Vector3(size, size, 1);
 
 		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
 
-		bulletScript.SetTeam(team);
-		bulletScript.owner = owner;
+		bulletScript.owner = PhotonNetwork.GetPhotonView(owner).GetComponent<PlayerScript>();
+		bulletScript.number = number;
 
 		bulletScript.moveDirection = direction;
 		bulletScript.damage = damage;
+	}
+
+	[PunRPC]
+	public void DestroyBullet(int owner, int number)
+	{
+		foreach (BulletScript bulletScript in FindObjectsOfType<BulletScript>())
+		{
+			if (bulletScript.owner.photonView.ViewID == owner && bulletScript.number == number)
+				Destroy(bulletScript.gameObject);
+		}
 	}
 }

@@ -16,13 +16,14 @@ public class AlternatorScript : WeaponScript
 
 	private int spawn = 0;
 
-	public override void Shoot(PhotonView photonView, Vector2 direction, int team, Color color)
+	public override void Shoot(PlayerScript playerScript, Vector2 direction)
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, photonView.ViewID, transform.Find($"Spawn {spawn + 1}").position, direction, team, damage, 0.3f, color);
-			prevTime = Time.time;
+			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID, playerScript.bulletCount++,
+				transform.Find($"Spawn {spawn + 1}").position, direction, damage, 0.3f);
 
+			prevTime = Time.time;
 			spawn = 1 - spawn;
 		}
 	}
