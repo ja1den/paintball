@@ -306,6 +306,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 0
+  playerScript: {fileID: 0}
+  fill: {fileID: 0}
 --- !u!1 &3926991158050026307
 GameObject:
   m_ObjectHideFlags: 0

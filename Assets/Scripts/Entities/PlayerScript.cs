@@ -25,9 +25,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	public int zoneDamage = 20;
 	public float prevTime = 0f;
 
-	[Header("Appearance")]
-	public Color color;
-
 	[Header("Weapons")]
 	public GameObject[] weapons;
 	public GameObject bulletPrefab;
@@ -63,11 +60,14 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	void Awake()
 	{
 		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-		zone = GameObject.Find("Background").transform.localScale;
 
 		rb = GetComponent<Rigidbody2D>();
 
 		transform.Find("Health").GetComponent<HealthScript>().maxHealth = maxHealth = health;
+		zone = GameObject.Find("Background").transform.localScale;
+
+		if (photonView.IsMine)
+			GameObject.Find("RespawnText").GetComponent<RespawnScript>().playerScript = this;
 	}
 
 	void Start()
@@ -224,7 +224,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	public void DestroyBullet(int owner, int number)
 	{
 		foreach (BulletScript bulletScript in FindObjectsOfType<BulletScript>())
-			if (bulletScript.owner.photonView.ViewID == owner && bulletScript.number == number)
-				Destroy(bulletScript.gameObject);
+		{
+			if (bulletScript.owner != null)
+			{
+				if (bulletScript.owner.photonView.ViewID == owner && bulletScript.number == number)
+					Destroy(bulletScript.gameObject);
+			}
+			else Destroy(bulletScript.gameObject);
+		}
 	}
 }

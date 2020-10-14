@@ -8,13 +8,13 @@ public class HealthScript : MonoBehaviour
 	public int maxHealth;
 
 	[Header("Debug")]
-	private PlayerScript playerScript;
+	public PlayerScript playerScript;
 
 	[Space(10)]
 
-	private GameObject fill;
+	public GameObject fill;
 
-	void Awake()
+	void Start()
 	{
 		playerScript = transform.parent.GetComponent<PlayerScript>();
 		fill = transform.Find("Fill").gameObject;

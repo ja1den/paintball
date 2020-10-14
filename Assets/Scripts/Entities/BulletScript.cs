@@ -16,9 +16,6 @@ public class BulletScript : MonoBehaviourPunCallbacks
 	public Vector2 moveDirection;
 	public float moveSpeed;
 
-	[Header("Appearance")]
-	public Color color;
-
 	[Header("Debug")]
 	private GameManager gameManager;
 
@@ -41,15 +38,7 @@ public class BulletScript : MonoBehaviourPunCallbacks
 
 		yield return new WaitForSeconds(10f);
 
-		if (owner != null)
-		{
-			if (owner.photonView.IsMine)
-				owner.photonView.RPC("DestroyBullet", RpcTarget.All, owner.photonView.ViewID, number);
-		}
-		else
-		{
-			Destroy(gameObject);
-		}
+		Destroy();
 	}
 
 	void OnTriggerEnter2D(Collider2D col)
@@ -62,7 +51,19 @@ public class BulletScript : MonoBehaviourPunCallbacks
 				playerScript.photonView.RPC("Damage", RpcTarget.All, damage);
 		}
 
-		if (owner.photonView.IsMine)
-			owner.photonView.RPC("DestroyBullet", RpcTarget.All, owner.photonView.ViewID, number);
+		Destroy();
+	}
+
+	void Destroy()
+	{
+		if (owner != null)
+		{
+			if (owner.photonView.IsMine)
+				owner.photonView.RPC("DestroyBullet", RpcTarget.All, owner.photonView.ViewID, number);
+		}
+		else
+		{
+			Destroy(gameObject);
+		}
 	}
 }
