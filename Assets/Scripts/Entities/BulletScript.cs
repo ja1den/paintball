@@ -1,13 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Realtime;
 using Photon.Pun;
 
 public class BulletScript : MonoBehaviourPunCallbacks
 {
 	[Header("Control")]
-	public PlayerScript owner;
+	public int actor;
 	public int number;
+
+	[Space(10)]
+
+	public PlayerScript playerScript;
 
 	[Header("Health")]
 	public int damage;
@@ -31,39 +36,35 @@ public class BulletScript : MonoBehaviourPunCallbacks
 
 	IEnumerator Start()
 	{
-		GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[owner.team].color;
+		actor = playerScript.photonView.OwnerActorNr;
+
+		GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[playerScript.team].color;
 		transform.SetParent(GameObject.Find("Bullets").transform);
 
 		rb.velocity = moveDirection * moveSpeed;
 
 		yield return new WaitForSeconds(10f);
 
-		Destroy();
+		if (playerScript.photonView.IsMine)
+			playerScript.photonView.RPC("DestroyBullet", RpcTarget.All, playerScript.photonView.ViewID, number);
 	}
 
 	void OnTriggerEnter2D(Collider2D col)
 	{
 		if (LayerMask.Equals(col.gameObject.layer, LayerMask.NameToLayer("Player")))
 		{
-			PlayerScript playerScript = col.gameObject.GetComponent<PlayerScript>();
+			PlayerScript script = col.gameObject.GetComponent<PlayerScript>();
 
-			if (playerScript.team != owner.team && owner.photonView.IsMine)
-				playerScript.photonView.RPC("Damage", RpcTarget.All, damage);
+			if (script.team != playerScript.team && playerScript.photonView.IsMine)
+				script.photonView.RPC("Damage", RpcTarget.All, damage);
 		}
 
-		Destroy();
+		if (playerScript.photonView.IsMine)
+			playerScript.photonView.RPC("DestroyBullet", RpcTarget.All, playerScript.photonView.ViewID, number);
 	}
 
-	void Destroy()
+	public override void OnPlayerLeftRoom(Player otherPlayer)
 	{
-		if (owner != null)
-		{
-			if (owner.photonView.IsMine)
-				owner.photonView.RPC("DestroyBullet", RpcTarget.All, owner.photonView.ViewID, number);
-		}
-		else
-		{
-			Destroy(gameObject);
-		}
+		if (actor == otherPlayer.ActorNumber) Destroy(gameObject);
 	}
 }

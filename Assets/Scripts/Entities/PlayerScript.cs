@@ -213,7 +213,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
 
-		bulletScript.owner = PhotonNetwork.GetPhotonView(owner).GetComponent<PlayerScript>();
+		bulletScript.playerScript = PhotonNetwork.GetPhotonView(owner).GetComponent<PlayerScript>();
 		bulletScript.number = number;
 
 		bulletScript.moveDirection = direction;
@@ -224,13 +224,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	public void DestroyBullet(int owner, int number)
 	{
 		foreach (BulletScript bulletScript in FindObjectsOfType<BulletScript>())
-		{
-			if (bulletScript.owner != null)
-			{
-				if (bulletScript.owner.photonView.ViewID == owner && bulletScript.number == number)
-					Destroy(bulletScript.gameObject);
-			}
-			else Destroy(bulletScript.gameObject);
-		}
+			if (bulletScript.playerScript.photonView.ViewID == owner && bulletScript.number == number)
+				Destroy(bulletScript.gameObject);
 	}
 }
