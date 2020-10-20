@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
 	[Header("Weapons")]
 	public GameObject[] weapons;
 
+	[Header("Colors")]
+	public Color[] colors;
+
 	void Awake()
 	{
 		// Load the Main Scene (Debug)
@@ -32,7 +35,7 @@ public class GameManager : MonoBehaviour
 	void Start()
 	{
 		// Player Data
-		object[] playerData = new object[] { Random.Range(0, weapons.Length), Color.HSVToRGB(Random.Range(0f, 1f), 0.5f, 1f) };
+		object[] playerData = new object[] { Random.Range(0, weapons.Length), colors[Random.Range(0, colors.Length)] };
 
 		// Spawn a Player
 		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawns[Random.Range(0, spawns.Length)].transform.position, Quaternion.identity, 0, playerData);
