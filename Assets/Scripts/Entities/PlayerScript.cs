@@ -3,68 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
 	[Header("Control")]
-	public int team;
+	public bool respawning = false;
+	public float respawn = 0;
 
 	[Space(10)]
 
-	public bool isRespawning = false;
-	public float respawn = 0;
+	public Color color;
 
 	[Header("Movement")]
 	public float speed;
 
 	[Header("Health")]
 	public int health;
-
-	[Space(10)]
-
 	public int zoneDamage = 20;
-	public float prevTime = 0f;
 
 	[Header("Weapons")]
-	public GameObject[] weapons;
 	public GameObject bulletPrefab;
-
-	[Space(10)]
-
 	public bool isShooting = false;
 
 	[Header("Debug")]
 	private GameManager gameManager;
-	private Vector2 zone;
-
-	[Space(10)]
 
 	private Rigidbody2D rb;
-
-	[Space(10)]
 
 	private Vector2 moveDirection;
 	private Vector2 lookDirection;
 
-	[Space(10)]
-
 	private int maxHealth;
 
-	[Space(10)]
+	private Vector2 zone;
+	private float prevTime = 0f;
 
 	private WeaponScript weaponScript;
 
-	[HideInInspector]
+	public Dictionary<int, GameObject> bullets = new Dictionary<int, GameObject>();
 	public int bulletCount = 0;
 
 	void Awake()
 	{
 		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
-		rb = GetComponent<Rigidbody2D>();
+		zone = GameObject.Find("Background").transform.localScale;
 
 		transform.Find("Health").GetComponent<HealthScript>().maxHealth = maxHealth = health;
-		zone = GameObject.Find("Background").transform.localScale;
+		rb = GetComponent<Rigidbody2D>();
 
 		if (photonView.IsMine)
 			GameObject.Find("RespawnText").GetComponent<RespawnScript>().playerScript = this;
@@ -79,7 +65,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	void FixedUpdate()
 	{
 		// Movement
-		if (!isRespawning) rb.velocity = moveDirection * speed;
+		if (!respawning) rb.velocity = moveDirection * speed;
 
 		// Shoot
 		if (weaponScript && isShooting) weaponScript.Shoot(this, lookDirection);
@@ -95,7 +81,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		}
 
 		// Respawn
-		if (isRespawning && respawn + 5f < Time.time)
+		if (respawning && respawn + 5f < Time.time)
 		{
 			// Show Sprites
 			foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
@@ -105,25 +91,28 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			GetComponent<CircleCollider2D>().enabled = true;
 
 			// Reset
-			isRespawning = false;
+			respawning = false;
 		}
 	}
 
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
 	{
-		// Color
-		SetTeam((int)info.photonView.InstantiationData[0]);
-
 		// Weapon
-		if (weapons.Length > 0)
-		{
-			GameObject weaponPrefab = weapons[(int)info.photonView.InstantiationData[1]];
+		GameObject weaponPrefab = gameManager.weapons[(int)info.photonView.InstantiationData[0]];
 
-			GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
-			weapon.transform.SetParent(transform.Find("Weapon"));
+		GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
+		weapon.transform.SetParent(transform.Find("Weapon"));
 
-			weaponScript = weapon.GetComponent<WeaponScript>();
-		}
+		weaponScript = weapon.GetComponent<WeaponScript>();
+
+		// Color
+		SetColor((Color)info.photonView.InstantiationData[1]);
+	}
+
+	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		foreach (KeyValuePair<int, GameObject> entry in bullets)
+			Destroy(entry.Value);
 	}
 
 	public void Move(InputAction.CallbackContext context)
@@ -141,7 +130,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Respawning
-		if (isRespawning) return;
+		if (respawning) return;
 
 		// Look at Cursor
 		Vector2 cursor = context.ReadValue<Vector2>();
@@ -159,7 +148,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Respawning
-		if (isRespawning) return;
+		if (respawning) return;
 
 		// Toggle Shooting
 		switch (context.phase)
@@ -174,9 +163,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		}
 	}
 
-	public void SetTeam(int team)
+	public void SetColor(Color color)
 	{
-		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = gameManager.teams[this.team = team].color;
+		transform.Find("Body").GetComponent<Shapes2D.Shape>().settings.fillColor = this.color = color;
 	}
 
 	[PunRPC]
@@ -187,7 +176,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (health == 0)
 		{
 			// Reset Player
-			transform.position = gameManager.teams[team].spawn.transform.position;
+			transform.position = gameManager.spawns[Random.Range(0, gameManager.spawns.Length)].transform.position;
 			health = maxHealth;
 
 			// Hide Sprites
@@ -198,7 +187,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			GetComponent<CircleCollider2D>().enabled = false;
 
 			// Respawn
-			isRespawning = true;
+			respawning = true;
 			respawn = Time.time;
 		}
 
@@ -206,25 +195,31 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	}
 
 	[PunRPC]
-	public void CreateBullet(int owner, int number, Vector3 position, Vector2 direction, int damage, float size)
+	public void CreateBullet(int owner, Vector3 position, Vector2 direction, int damage, float size)
 	{
 		GameObject bullet = Instantiate(bulletPrefab, position, Quaternion.identity);
 		bullet.transform.localScale = new Vector3(size, size, 1);
 
 		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
-
 		bulletScript.playerScript = PhotonNetwork.GetPhotonView(owner).GetComponent<PlayerScript>();
-		bulletScript.number = number;
 
 		bulletScript.moveDirection = direction;
 		bulletScript.damage = damage;
+
+		bulletScript.SetColor(color);
+
+		bulletScript.number = bulletCount;
+		bullets.Add(bulletCount++, bullet);
 	}
 
 	[PunRPC]
-	public void DestroyBullet(int owner, int number)
+	public void DestroyBullet(int number)
 	{
-		foreach (BulletScript bulletScript in FindObjectsOfType<BulletScript>())
-			if (bulletScript.playerScript.photonView.ViewID == owner && bulletScript.number == number)
-				Destroy(bulletScript.gameObject);
+		GameObject bullet;
+		if (bullets.TryGetValue(number, out bullet))
+		{
+			bullets.Remove(number);
+			Destroy(bullet);
+		}
 	}
 }

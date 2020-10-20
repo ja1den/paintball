@@ -28,7 +28,7 @@ public class CameraScript : MonoBehaviour
 	{
 		if (target)
 		{
-			if (playerScript.isRespawning)
+			if (playerScript.respawning)
 			{
 				transform.position = Vector3.SmoothDamp(transform.position, target.transform.position + offset, ref velocity, speed);
 			}

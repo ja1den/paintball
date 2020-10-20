@@ -16,10 +16,10 @@ public class DoubleScript : WeaponScript
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID, playerScript.bulletCount++,
+			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID,
 				transform.Find("Spawn 1").position, direction, damage, 0.4f);
 
-			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID, playerScript.bulletCount++,
+			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID,
 				transform.Find("Spawn 2").position, direction * -1, damage, 0.4f);
 
 			prevTime = Time.time;

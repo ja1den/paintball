@@ -20,7 +20,7 @@ public class AlternatorScript : WeaponScript
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID, playerScript.bulletCount++,
+			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID,
 				transform.Find($"Spawn {spawn + 1}").position, direction, damage, 0.3f);
 
 			prevTime = Time.time;

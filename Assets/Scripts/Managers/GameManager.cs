@@ -4,20 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 
-[System.Serializable]
-public struct Team
-{
-	public GameObject spawn;
-	public Color color;
-}
-
 public class GameManager : MonoBehaviour
 {
 	[Header("GameObjects")]
 	public GameObject playerPrefab;
 
-	[Header("Teams")]
-	public Team[] teams;
+	[Space(10)]
+
+	public GameObject[] spawns;
 
 	[Header("Weapons")]
 	public GameObject[] weapons;
@@ -31,18 +25,17 @@ public class GameManager : MonoBehaviour
 			return;
 		}
 
-		// Validate
-		if (teams.Length == 0) throw new System.ArgumentException("Array cannot be empty", "teams");
+		// Spawns
+		spawns = GameObject.FindGameObjectsWithTag("Respawn");
 	}
 
 	void Start()
 	{
 		// Player Data
-		int team = Random.Range(0, teams.Length);
+		object[] playerData = new object[] { Random.Range(0, weapons.Length), Color.HSVToRGB(Random.Range(0f, 1f), 0.5f, 1f) };
 
 		// Spawn a Player
-		object[] playerData = new object[] { team, Random.Range(0, weapons.Length) };
-		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, teams[team].spawn.transform.position, Quaternion.identity, 0, playerData);
+		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawns[Random.Range(0, spawns.Length)].transform.position, Quaternion.identity, 0, playerData);
 
 		// Assign the Camera
 		Camera.main.GetComponent<CameraScript>().target = player;

@@ -21,6 +21,6 @@ public class RespawnScript : MonoBehaviour
 	void Update()
 	{
 		text.text = Mathf.CeilToInt(5 - (Time.time - playerScript.respawn)).ToString();
-		text.enabled = playerScript.isRespawning;
+		text.enabled = playerScript.respawning;
 	}
 }

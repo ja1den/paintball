@@ -16,7 +16,7 @@ public class SniperScript : WeaponScript
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID, playerScript.bulletCount++,
+			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID,
 				transform.Find("Spawn").position, direction, damage, 0.45f);
 
 			prevTime = Time.time;
