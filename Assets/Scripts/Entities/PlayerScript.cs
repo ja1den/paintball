@@ -9,7 +9,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 {
 	[Header("Control")]
 	public bool isAlive = false;
-	public float respawn = 0;
+	public float respawn = 3;
 
 	[Space(10)]
 
@@ -64,22 +64,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	void FixedUpdate()
 	{
-		// Movement
-		if (isAlive) rb.velocity = moveDirection * speed;
-
-		// Shoot
-		if (weaponScript && isShooting) weaponScript.Shoot(this, lookDirection);
-
-		// Zone Tick
-		if (transform.position.x < -zone.x / 2 || zone.x / 2 < transform.position.x || transform.position.y < -zone.y / 2 || zone.y / 2 < transform.position.y)
-		{
-			if (prevTime + 0.5f < Time.time)
-			{
-				if (photonView.IsMine) photonView.RPC("Damage", RpcTarget.All, zoneDamage);
-				prevTime = Time.time;
-			}
-		}
-
 		// Respawn
 		if (!isAlive && respawn + 5f < Time.time)
 		{
@@ -92,6 +76,34 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 			// Reset
 			isAlive = true;
+		}
+
+		// Client's Player
+		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
+		// Move
+		if (isAlive && gameManager.isPlaying) rb.velocity = moveDirection * speed;
+
+		// Look
+		if (isAlive && gameManager.isPlaying)
+		{
+			float angle = Vector2.SignedAngle(Vector2.up, lookDirection);
+			weaponScript.transform.parent.transform.rotation = Quaternion.Euler(0, 0, angle);
+		}
+
+		// Shoot
+		if (weaponScript && isShooting)
+			if (isAlive && gameManager.isPlaying)
+				weaponScript.Shoot(this, lookDirection);
+
+		// Zone Tick
+		if (transform.position.x < -zone.x / 2 || zone.x / 2 < transform.position.x || transform.position.y < -zone.y / 2 || zone.y / 2 < transform.position.y)
+		{
+			if (prevTime + 0.5f < Time.time)
+			{
+				photonView.RPC("Damage", RpcTarget.All, zoneDamage);
+				prevTime = Time.time;
+			}
 		}
 	}
 
@@ -129,26 +141,17 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-		// Respawning
-		if (!isAlive) return;
-
 		// Look at Cursor
 		Vector2 cursor = context.ReadValue<Vector2>();
 		Vector2 offset = new Vector2(Screen.width, Screen.height) * 0.5f;
 
 		lookDirection = (cursor - offset).normalized;
-
-		float angle = Vector2.SignedAngle(Vector2.up, lookDirection);
-		weaponScript.transform.parent.transform.rotation = Quaternion.Euler(0, 0, angle);
 	}
 
 	public void Fire(InputAction.CallbackContext context)
 	{
 		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
-
-		// Respawning
-		if (!isAlive) return;
 
 		// Toggle Shooting
 		switch (context.phase)

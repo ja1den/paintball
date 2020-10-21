@@ -6,7 +6,16 @@ using Photon.Pun;
 public class GameManager : MonoBehaviour
 {
 	[Header("Control")]
-	public bool isPlaying;
+	public bool isPlaying = false;
+
+	[Space(10)]
+
+	public float startLength = 3f;
+
+	[Space(10)]
+
+	public double startTime;
+	public double time;
 
 	[Header("GameObjects")]
 	public GameObject playerPrefab;
@@ -22,6 +31,9 @@ public class GameManager : MonoBehaviour
 	{
 		// Spawns
 		spawns = GameObject.FindGameObjectsWithTag("Respawn");
+
+		// Timer
+		startTime = PhotonNetwork.Time;
 	}
 
 	void Start()
@@ -32,5 +44,11 @@ public class GameManager : MonoBehaviour
 
 		// Assign the Camera
 		Camera.main.GetComponent<CameraScript>().SetTarget(player.GetComponent<PlayerScript>());
+	}
+
+	void Update()
+	{
+		time = PhotonNetwork.Time - startTime;
+		if (time > startLength) isPlaying = true;
 	}
 }
