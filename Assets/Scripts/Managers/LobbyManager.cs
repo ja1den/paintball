@@ -25,7 +25,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 	{
 		if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
 		{
-			PhotonNetwork.LoadLevel("GameScene");
+			LoadGame();
 		}
 
 		UpdateUI();
@@ -42,8 +42,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 		playButton.gameObject.SetActive(PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount != 1);
 	}
 
-	public void PlayButton()
+	public void LoadGame()
 	{
-		if (PhotonNetwork.IsMasterClient) PhotonNetwork.LoadLevel("GameScene");
+		if (PhotonNetwork.IsMasterClient)
+		{
+			PhotonNetwork.LoadLevel("GameScene");
+
+			PhotonNetwork.CurrentRoom.IsVisible = false;
+			PhotonNetwork.CurrentRoom.IsOpen = false;
+		}
 	}
 }
