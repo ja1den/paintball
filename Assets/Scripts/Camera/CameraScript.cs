@@ -19,16 +19,11 @@ public class CameraScript : MonoBehaviour
 
 	private Vector3 velocity;
 
-	void Start()
-	{
-		playerScript = target.GetComponent<PlayerScript>();
-	}
-
 	void Update()
 	{
 		if (target)
 		{
-			if (playerScript.respawning)
+			if (!playerScript.isAlive)
 			{
 				transform.position = Vector3.SmoothDamp(transform.position, target.transform.position + offset, ref velocity, speed);
 			}
@@ -37,5 +32,10 @@ public class CameraScript : MonoBehaviour
 				transform.position = target.transform.position + offset;
 			}
 		}
+	}
+
+	public void SetTarget(PlayerScript playerScript)
+	{
+		transform.position = (target = (this.playerScript = playerScript).gameObject).transform.position + offset;
 	}
 }

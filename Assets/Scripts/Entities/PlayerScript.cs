@@ -8,7 +8,7 @@ using Photon.Realtime;
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
 	[Header("Control")]
-	public bool respawning = false;
+	public bool isAlive = false;
 	public float respawn = 0;
 
 	[Space(10)]
@@ -65,7 +65,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	void FixedUpdate()
 	{
 		// Movement
-		if (!respawning) rb.velocity = moveDirection * speed;
+		if (isAlive) rb.velocity = moveDirection * speed;
 
 		// Shoot
 		if (weaponScript && isShooting) weaponScript.Shoot(this, lookDirection);
@@ -81,7 +81,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		}
 
 		// Respawn
-		if (respawning && respawn + 5f < Time.time)
+		if (!isAlive && respawn + 5f < Time.time)
 		{
 			// Show Sprites
 			foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
@@ -91,7 +91,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			GetComponent<CircleCollider2D>().enabled = true;
 
 			// Reset
-			respawning = false;
+			isAlive = true;
 		}
 	}
 
@@ -130,7 +130,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Respawning
-		if (respawning) return;
+		if (!isAlive) return;
 
 		// Look at Cursor
 		Vector2 cursor = context.ReadValue<Vector2>();
@@ -148,7 +148,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 		// Respawning
-		if (respawning) return;
+		if (!isAlive) return;
 
 		// Toggle Shooting
 		switch (context.phase)
@@ -187,7 +187,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			GetComponent<CircleCollider2D>().enabled = false;
 
 			// Respawn
-			respawning = true;
+			isAlive = false;
 			respawn = Time.time;
 		}
 

@@ -27,15 +27,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	public override void OnJoinedRoom()
 	{
-		if (PhotonNetwork.IsMasterClient)
-		{
-			PhotonNetwork.LoadLevel("GameScene");
-		}
+		if (PhotonNetwork.IsMasterClient) PhotonNetwork.LoadLevel("LobbyScene");
 	}
 
 	public override void OnJoinRandomFailed(short returnCode, string message)
 	{
-		PhotonNetwork.CreateRoom(null, new RoomOptions());
+		PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 8 });
 	}
 
 	public override void OnDisconnected(DisconnectCause cause)

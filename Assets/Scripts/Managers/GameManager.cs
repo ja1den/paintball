@@ -1,16 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Photon.Pun;
 
 public class GameManager : MonoBehaviour
 {
+	[Header("Control")]
+	public bool isPlaying;
+
 	[Header("GameObjects")]
 	public GameObject playerPrefab;
-
-	[Space(10)]
-
 	public GameObject[] spawns;
 
 	[Header("Weapons")]
@@ -21,26 +20,17 @@ public class GameManager : MonoBehaviour
 
 	void Awake()
 	{
-		// Load the Main Scene (Debug)
-		if (!PhotonNetwork.InRoom)
-		{
-			SceneManager.LoadScene("LoadScene", LoadSceneMode.Single);
-			return;
-		}
-
 		// Spawns
 		spawns = GameObject.FindGameObjectsWithTag("Respawn");
 	}
 
 	void Start()
 	{
-		// Player Data
-		object[] playerData = new object[] { Random.Range(0, weapons.Length), colors[Random.Range(0, colors.Length)] };
-
 		// Spawn a Player
+		object[] playerData = new object[] { Random.Range(0, weapons.Length), colors[Random.Range(0, colors.Length)] };
 		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawns[Random.Range(0, spawns.Length)].transform.position, Quaternion.identity, 0, playerData);
 
 		// Assign the Camera
-		Camera.main.GetComponent<CameraScript>().target = player;
+		Camera.main.GetComponent<CameraScript>().SetTarget(player.GetComponent<PlayerScript>());
 	}
 }
