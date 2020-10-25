@@ -23,14 +23,7 @@ public class CameraScript : MonoBehaviour
 	{
 		if (target)
 		{
-			if (!playerScript.isAlive)
-			{
-				transform.position = Vector3.SmoothDamp(transform.position, target.transform.position + offset, ref velocity, speed);
-			}
-			else
-			{
-				transform.position = target.transform.position + offset;
-			}
+			transform.position = target.transform.position + offset;
 		}
 	}
 

@@ -64,47 +64,55 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	void FixedUpdate()
 	{
-		// Respawn
-		if (!isAlive && respawn + 5f < Time.time)
+		// Alive
+		if (!isAlive)
 		{
-			// Show Sprites
-			foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
-				spriteRenderer.enabled = true;
+			// Respawn
+			if (respawn + 5f < Time.time)
+			{
+				// Show Sprites
+				foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
+					spriteRenderer.enabled = true;
 
-			// Enable Collider
-			GetComponent<CircleCollider2D>().enabled = true;
+				// Enable Collider
+				GetComponent<CircleCollider2D>().enabled = true;
 
-			// Reset
-			isAlive = true;
+				// Reset
+				isAlive = true;
+			}
+
 		}
-
-		// Client's Player
-		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
-
-		// Move
-		if (isAlive && gameManager.isPlaying) rb.velocity = moveDirection * speed;
-
-		// Look
-		if (isAlive && gameManager.isPlaying)
+		else
 		{
+			// Client's Player
+			if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
+			// Playing
+			if (!gameManager.isPlaying) return;
+
+			// Move
+			rb.velocity = moveDirection * speed;
+
+			// Look
 			float angle = Vector2.SignedAngle(Vector2.up, lookDirection);
 			weaponScript.transform.parent.transform.rotation = Quaternion.Euler(0, 0, angle);
-		}
 
-		// Shoot
-		if (weaponScript && isShooting)
-			if (isAlive && gameManager.isPlaying)
+			// Shoot
+			if (weaponScript && isShooting)
 				weaponScript.Shoot(this, lookDirection);
 
-		// Zone Tick
-		if (transform.position.x < -zone.x / 2 || zone.x / 2 < transform.position.x || transform.position.y < -zone.y / 2 || zone.y / 2 < transform.position.y)
-		{
-			if (prevTime + 0.5f < Time.time)
+			// Zone Tick
+			if (transform.position.x < -zone.x / 2 || zone.x / 2 < transform.position.x || transform.position.y < -zone.y / 2 || zone.y / 2 < transform.position.y)
 			{
-				photonView.RPC("Damage", RpcTarget.All, zoneDamage);
-				prevTime = Time.time;
+				if (prevTime + 0.5f < Time.time)
+				{
+					photonView.RPC("Damage", RpcTarget.All, zoneDamage);
+					prevTime = Time.time;
+				}
 			}
 		}
+
+
 	}
 
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
