@@ -186,8 +186,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 		if (health == 0)
 		{
-			// Reset Player
-			transform.position = gameManager.spawns[Random.Range(0, gameManager.spawns.Length)].transform.position;
+			// Respawn
+			respawn = Time.time;
+			isAlive = false;
+
+			// Reset
 			health = maxHealth;
 
 			// Hide Sprites
@@ -197,9 +200,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			// Disable Collider
 			GetComponent<CircleCollider2D>().enabled = false;
 
-			// Respawn
-			isAlive = false;
-			respawn = Time.time;
+			// Client's Player
+			if (!photonView.IsMine && PhotonNetwork.IsConnected) return health;
+
+			// Spawnpoint
+			transform.position = gameManager.spawns[Random.Range(0, gameManager.spawns.Length)].transform.position;
 		}
 
 		return health;
