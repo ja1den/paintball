@@ -9,8 +9,6 @@ public class CounterScript : MonoBehaviour
 	[Header("Debug")]
 	private TMP_Text text;
 
-	[Space(10)]
-
 	private GameManager gameManager;
 
 	void Awake()

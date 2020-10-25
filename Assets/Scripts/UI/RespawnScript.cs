@@ -8,8 +8,6 @@ public class RespawnScript : MonoBehaviour
 	[Header("Debug")]
 	private TMP_Text text;
 
-	[Space(10)]
-
 	[HideInInspector]
 	public PlayerScript playerScript;
 

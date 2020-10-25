@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
 	[Header("Control")]
 	public bool isPlaying = false;
@@ -11,6 +12,7 @@ public class GameManager : MonoBehaviour
 	[Space(10)]
 
 	public float startLength = 3f;
+	public float roundLength = 120f;
 
 	[Space(10)]
 
@@ -34,6 +36,15 @@ public class GameManager : MonoBehaviour
 
 		// Timer
 		startTime = PhotonNetwork.Time;
+
+		// Room Properties
+		if (PhotonNetwork.IsMasterClient)
+		{
+			Hashtable roomProps = new Hashtable();
+			roomProps.Add("startTime", startTime);
+
+			PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+		}
 	}
 
 	void Start()
@@ -48,7 +59,15 @@ public class GameManager : MonoBehaviour
 
 	void Update()
 	{
-		time = PhotonNetwork.Time - startTime;
-		if (time > startLength) isPlaying = true;
+		if ((time = PhotonNetwork.Time - startTime) > startLength) isPlaying = true;
+	}
+
+	public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+	{
+		object startTime;
+		if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("startTime", out startTime))
+		{
+			this.startTime = (double)startTime;
+		}
 	}
 }
