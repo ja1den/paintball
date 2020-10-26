@@ -86,6 +86,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 				isAlive = true;
 			}
 
+			rb.velocity = Vector3.zero;
 		}
 		else
 		{
