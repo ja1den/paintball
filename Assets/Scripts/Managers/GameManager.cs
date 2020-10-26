@@ -2,12 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+
+public enum GameState
+{
+	Start, Play, End
+}
+
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
 	[Header("Control")]
-	public bool isPlaying = false;
+	public GameState gameState = GameState.Start;
 
 	[Space(10)]
 
@@ -49,9 +56,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 	void Start()
 	{
-		// Spawn a Player
+		// Player Data
 		object[] playerData = new object[] { Random.Range(0, weapons.Length), colors[Random.Range(0, colors.Length)] };
-		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawns[Random.Range(0, spawns.Length)].transform.position, Quaternion.identity, 0, playerData);
+
+		// Spawn a Player
+		Vector3 spawnPos = spawns[Random.Range(0, spawns.Length)].transform.position;
+		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos, Quaternion.identity, 0, playerData);
 
 		// Assign the Camera
 		Camera.main.GetComponent<CameraScript>().SetTarget(player.GetComponent<PlayerScript>());
@@ -59,7 +69,24 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 	void Update()
 	{
-		if ((time = PhotonNetwork.Time - startTime) > startLength) isPlaying = true;
+		// Update Time
+		time = PhotonNetwork.Time - startTime;
+
+		// Game State
+		switch (gameState)
+		{
+			case GameState.Start:
+				if (time > startLength) gameState = GameState.Play;
+				break;
+
+			case GameState.Play:
+				if (time > startLength + roundLength)
+				{
+					if (PhotonNetwork.IsMasterClient) PhotonNetwork.LoadLevel("ScoreScene");
+					gameState = GameState.End;
+				}
+				break;
+		}
 	}
 
 	public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)

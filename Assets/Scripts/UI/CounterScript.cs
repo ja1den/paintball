@@ -20,6 +20,6 @@ public class CounterScript : MonoBehaviour
 	void Update()
 	{
 		text.text = Mathf.CeilToInt(gameManager.startLength - (float)gameManager.time).ToString();
-		text.enabled = !gameManager.isPlaying;
+		text.enabled = gameManager.gameState == GameState.Start;
 	}
 }

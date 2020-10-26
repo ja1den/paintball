@@ -4,12 +4,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
 using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
 	[Header("Control")]
 	public bool isAlive = false;
 	public float respawn = 3;
+
+	[Space(10)]
+
+	public int score = 0;
 
 	[Space(10)]
 
@@ -88,7 +93,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 			// Playing
-			if (!gameManager.isPlaying) return;
+			if (gameManager.gameState != GameState.Play)
+			{
+				rb.velocity = Vector3.zero;
+				return;
+			}
 
 			// Move
 			rb.velocity = moveDirection * speed;
@@ -111,8 +120,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 				}
 			}
 		}
-
-
 	}
 
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -180,7 +187,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	}
 
 	[PunRPC]
-	public int Damage(int damage)
+	public int Damage(int damage, int dealer)
 	{
 		health = Mathf.Max(0, health - damage);
 
@@ -205,6 +212,15 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 			// Spawnpoint
 			transform.position = gameManager.spawns[Random.Range(0, gameManager.spawns.Length)].transform.position;
+
+			// Update Score
+			Player player = PhotonNetwork.CurrentRoom.GetPlayer(dealer);
+			player.CustomProperties.TryGetValue("score", out object score);
+
+			Hashtable playerProps = new Hashtable();
+			playerProps.Add("score", (int)(score ?? 0) + 1);
+
+			player.SetCustomProperties(playerProps);
 		}
 
 		return health;

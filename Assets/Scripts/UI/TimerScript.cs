@@ -21,6 +21,6 @@ public class TimerScript : MonoBehaviour
 	void Update()
 	{
 		text.text = TimeSpan.FromSeconds(gameManager.roundLength - Math.Floor(gameManager.time - gameManager.startLength)).ToString(@"mm\:ss");
-		text.enabled = gameManager.isPlaying;
+		text.enabled = gameManager.gameState == GameState.Play;
 	}
 }

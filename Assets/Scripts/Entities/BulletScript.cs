@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Realtime;
 using Photon.Pun;
 
 public class BulletScript : MonoBehaviourPunCallbacks
@@ -46,7 +45,7 @@ public class BulletScript : MonoBehaviourPunCallbacks
 	{
 		if (LayerMask.Equals(col.gameObject.layer, LayerMask.NameToLayer("Player")))
 			if (playerScript.photonView.IsMine)
-				col.gameObject.GetComponent<PlayerScript>().photonView.RPC("Damage", RpcTarget.All, damage);
+				col.gameObject.GetComponent<PlayerScript>().photonView.RPC("Damage", RpcTarget.All, damage, playerScript.photonView.OwnerActorNr);
 
 		if (playerScript.photonView.IsMine)
 			playerScript.photonView.RPC("DestroyBullet", RpcTarget.All, number);
