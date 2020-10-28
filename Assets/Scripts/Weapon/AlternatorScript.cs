@@ -6,8 +6,12 @@ using Photon.Pun;
 public class AlternatorScript : WeaponScript
 {
 	[Header("Attributes")]
-	public int damage = 10;
 	public float delay = 0.1f;
+
+	[Space(10)]
+
+	public int damage = 10;
+	public float size = 0.3f;
 
 	[Header("Debug")]
 	private float prevTime = 0f;
@@ -20,8 +24,7 @@ public class AlternatorScript : WeaponScript
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID,
-				transform.Find($"Spawn {spawn + 1}").position, direction, damage, 0.3f);
+			CreateBullet(playerScript, transform.Find($"Spawn {spawn + 1}"), damage, size);
 
 			prevTime = Time.time;
 			spawn = 1 - spawn;

@@ -116,7 +116,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			{
 				if (prevTime + 0.5f < Time.time)
 				{
-					photonView.RPC("Damage", RpcTarget.All, zoneDamage);
+					photonView.RPC("Damage", RpcTarget.All, zoneDamage, -1);
 					prevTime = Time.time;
 				}
 			}
@@ -188,8 +188,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	}
 
 	[PunRPC]
-	public int Damage(int damage, int dealer)
+	public void Damage(int damage, int dealer)
 	{
+		// Alive?
+		if (!isAlive) return;
+
+		// Apply Damage
 		health = Mathf.Max(0, health - damage);
 
 		if (health == 0)
@@ -209,10 +213,13 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			GetComponent<CircleCollider2D>().enabled = false;
 
 			// Client's Player
-			if (!photonView.IsMine && PhotonNetwork.IsConnected) return health;
+			if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 			// Spawnpoint
 			transform.position = gameManager.spawns[Random.Range(0, gameManager.spawns.Length)].transform.position;
+
+			// Zone Damage
+			if (dealer == -1) return;
 
 			// Update Score
 			Player player = PhotonNetwork.CurrentRoom.GetPlayer(dealer);
@@ -223,8 +230,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 			player.SetCustomProperties(playerProps);
 		}
-
-		return health;
 	}
 
 	[PunRPC]

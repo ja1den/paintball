@@ -6,8 +6,12 @@ using Photon.Pun;
 public class DoubleScript : WeaponScript
 {
 	[Header("Attributes")]
-	public int damage = 25;
 	public float delay = 0.25f;
+
+	[Space(10)]
+
+	public int damage = 25;
+	public float size = 0.4f;
 
 	[Header("Debug")]
 	private float prevTime = 0f;
@@ -16,11 +20,8 @@ public class DoubleScript : WeaponScript
 	{
 		if (prevTime + delay < Time.time)
 		{
-			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID,
-				transform.Find("Spawn 1").position, direction, damage, 0.4f);
-
-			photonView.RPC("CreateBullet", RpcTarget.All, playerScript.photonView.ViewID,
-				transform.Find("Spawn 2").position, direction * -1, damage, 0.4f);
+			CreateBullet(playerScript, transform.Find("Spawn 1"), damage, size);
+			CreateBullet(playerScript, transform.Find("Spawn 2"), damage, size);
 
 			prevTime = Time.time;
 		}

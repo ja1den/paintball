@@ -24,8 +24,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 866578746400296889}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.2, y: 0.35, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: 0.2, y: 1.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2439212513752825160}
   m_RootOrder: 3
@@ -55,7 +55,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2439212513752825163}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.55, z: 0.1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2323399436023116679}
@@ -77,8 +77,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14d235e9236afa14d8b8d47442f8aabe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
   delay: 0.1
+  damage: 10
+  size: 0.3
 --- !u!1 &5174913547527510874
 GameObject:
   m_ObjectHideFlags: 0
@@ -105,8 +106,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5174913547527510874}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.2, y: 0, z: 0}
-  m_LocalScale: {x: 0.35, y: 0.45, z: 1}
+  m_LocalPosition: {x: 0.2, y: 0.55, z: 0}
+  m_LocalScale: {x: 0.35, y: 0.6, z: 1}
   m_Children: []
   m_Father: {fileID: 2439212513752825160}
   m_RootOrder: 2
@@ -241,8 +242,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7945123382610553925}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.2, y: 0.35, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: -0.2, y: 1.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2439212513752825160}
   m_RootOrder: 1
@@ -273,8 +274,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8057127158563355492}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.2, y: 0, z: 0}
-  m_LocalScale: {x: 0.35, y: 0.45, z: 1}
+  m_LocalPosition: {x: -0.2, y: 0.55, z: 0}
+  m_LocalScale: {x: 0.35, y: 0.6, z: 1}
   m_Children: []
   m_Father: {fileID: 2439212513752825160}
   m_RootOrder: 0
