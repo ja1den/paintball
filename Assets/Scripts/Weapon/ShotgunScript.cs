@@ -26,20 +26,17 @@ public class ShotgunScript : WeaponScript
 		{
 			Shape shape = transform.Find("Barrel").GetComponent<Shape>();
 
-			Vector3[] points = new Vector3[4];
-
-			points[0] = new Vector3(0.3f, 0.9f, 0);
-			points[1] = new Vector3(-0.3f, 0.9f, 0);
-			points[2] = new Vector3(-0.2f, 0.4f, 0);
-			points[3] = new Vector3(0.2f, 0.4f, 0);
-
-			shape.settings.shapeType = ShapeType.Polygon;
-			shape.SetPolygonWorldVertices(points);
+			shape.settings.polyVertices = new Vector2[4] {
+				new Vector2(-0.4f, -0.5f),
+				new Vector2(-0.5f,  0.5f),
+				new Vector2( 0.5f,  0.5f),
+				new Vector2( 0.4f, -0.5f)
+			};
 
 			shape.ComputeAndApply();
-
-			generate = false;
 		}
+
+		generate = false;
 	}
 
 	public override void Shoot(PlayerScript playerScript, Vector2 direction)

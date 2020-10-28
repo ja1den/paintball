@@ -7,6 +7,6 @@ public class VersionScript : MonoBehaviour
 {
 	void Start()
 	{
-		GetComponent<TMP_Text>().text = $"v{Application.version}";
+		GetComponent<TMP_Text>().text = Application.version;
 	}
 }
