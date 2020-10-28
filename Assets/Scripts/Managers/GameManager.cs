@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 	void Start()
 	{
 		// Player Data
-		object[] playerData = new object[] { Random.Range(0, weapons.Length), colors[Random.Range(0, colors.Length)] };
+		object[] playerData = new object[] { Random.Range(0, weapons.Length) };
 
 		// Spawn a Player
 		Vector3 spawnPos = spawns[Random.Range(0, spawns.Length)].transform.position;

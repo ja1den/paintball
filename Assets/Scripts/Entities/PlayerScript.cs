@@ -134,7 +134,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		weaponScript = weapon.GetComponent<WeaponScript>();
 
 		// Color
-		SetColor((Color)info.photonView.InstantiationData[1]);
+		SetColor(gameManager.colors[PhotonNetwork.LocalPlayer.ActorNumber - 1]);
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
