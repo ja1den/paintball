@@ -2,8 +2,8 @@ name: Activate License
 
 on:
   push:
-    branches-ignore:
-      - '**'
+    branches:
+      - master
 
 jobs:
   activation:
