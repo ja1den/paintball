@@ -7,14 +7,14 @@ using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Shapes2D;
 
-public class ScoreScript : MonoBehaviourPunCallbacks
+public class LeaderScript : MonoBehaviourPunCallbacks
 {
 	[Header("Debug")]
 	private TMP_Text text;
 
 	void Awake()
 	{
-		text = transform.Find("Text").GetComponent<TMP_Text>();
+		text = GetComponent<TMP_Text>();
 	}
 
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

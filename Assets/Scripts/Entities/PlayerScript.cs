@@ -14,10 +14,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Space(10)]
 
-	public int score = 0;
-
-	[Space(10)]
-
 	public Color color;
 
 	[Header("Movement")]
@@ -46,8 +42,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	private WeaponScript weaponScript;
 
-	public Dictionary<int, GameObject> bullets = new Dictionary<int, GameObject>();
-	public int bulletCount = 0;
+	private Dictionary<int, GameObject> bullets = new Dictionary<int, GameObject>();
+	private int bulletCount = 0;
 
 	void Awake()
 	{
@@ -134,7 +130,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		weaponScript = weapon.GetComponent<WeaponScript>();
 
 		// Color
-		SetColor(gameManager.colors[PhotonNetwork.LocalPlayer.ActorNumber - 1]);
+		SetColor(gameManager.colors[photonView.OwnerActorNr - 1]);
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
