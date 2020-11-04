@@ -33,9 +33,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 	[Header("Weapons")]
 	public GameObject[] weapons;
 
-	[Header("Colors")]
-	public Color[] colors;
-
 	void Awake()
 	{
 		// Spawns
@@ -56,12 +53,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 	void Start()
 	{
-		// Player Data
-		object[] playerData = new object[] { Random.Range(0, weapons.Length) };
-
 		// Spawn a Player
 		Vector3 spawnPos = spawns[Random.Range(0, spawns.Length)].transform.position;
-		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos, Quaternion.identity, 0, playerData);
+		GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos, Quaternion.identity, 0);
 
 		// Assign the Camera
 		Camera.main.GetComponent<CameraScript>().SetTarget(player.GetComponent<PlayerScript>());

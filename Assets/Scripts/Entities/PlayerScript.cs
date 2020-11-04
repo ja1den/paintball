@@ -6,7 +6,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
+public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable
 {
 	[Header("Control")]
 	public bool isAlive = false;
@@ -28,6 +28,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	public bool isShooting = false;
 
 	[Header("Debug")]
+	private NetworkManager networkManager;
 	private GameManager gameManager;
 
 	private Rigidbody2D rb;
@@ -47,7 +48,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	void Awake()
 	{
+		networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
 		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
 		zone = GameObject.Find("Background").transform.localScale;
 
 		transform.Find("Health").GetComponent<HealthScript>().maxHealth = maxHealth = health;
@@ -68,17 +71,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		// Alive
 		if (!isAlive)
 		{
-			// Respawn
 			if (respawn + 5f < Time.time)
 			{
-				// Show Sprites
-				foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
-					spriteRenderer.enabled = true;
-
-				// Enable Collider
-				GetComponent<CircleCollider2D>().enabled = true;
-
-				// Reset
+				health = maxHealth;
 				isAlive = true;
 			}
 
@@ -122,7 +117,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
 	{
 		// Weapon
-		GameObject weaponPrefab = gameManager.weapons[(int)info.photonView.InstantiationData[0]];
+		photonView.Owner.CustomProperties.TryGetValue("weapon", out object number);
+		GameObject weaponPrefab = gameManager.weapons[(int)number];
 
 		GameObject weapon = Instantiate(weaponPrefab, transform.position + weaponPrefab.transform.position, Quaternion.identity);
 		weapon.transform.SetParent(transform.Find("Weapon"));
@@ -130,13 +126,32 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		weaponScript = weapon.GetComponent<WeaponScript>();
 
 		// Color
-		SetColor(gameManager.colors[photonView.OwnerActorNr - 1]);
+		SetColor(networkManager.colors[(photonView.OwnerActorNr - 1) % 8]);
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
 	{
 		foreach (KeyValuePair<int, GameObject> entry in bullets)
 			Destroy(entry.Value);
+	}
+
+	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+		if (stream.IsWriting)
+		{
+			stream.SendNext(health);
+		}
+		else
+		{
+			health = (int)stream.ReceiveNext();
+		}
+
+		// Update Sprites
+		foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
+			spriteRenderer.enabled = health != 0;
+
+		// Update Collider
+		GetComponent<CircleCollider2D>().enabled = health != 0;
 	}
 
 	public void Move(InputAction.CallbackContext context)
@@ -186,6 +201,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	[PunRPC]
 	public void Damage(int damage, int dealer)
 	{
+		// Client's Player
+		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
 		// Alive?
 		if (!isAlive) return;
 
@@ -197,19 +215,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			// Respawn
 			respawn = Time.time;
 			isAlive = false;
-
-			// Reset
-			health = maxHealth;
-
-			// Hide Sprites
-			foreach (SpriteRenderer spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
-				spriteRenderer.enabled = false;
-
-			// Disable Collider
-			GetComponent<CircleCollider2D>().enabled = false;
-
-			// Client's Player
-			if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
 			// Spawnpoint
 			transform.position = gameManager.spawns[Random.Range(0, gameManager.spawns.Length)].transform.position;

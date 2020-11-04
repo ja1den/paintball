@@ -7,6 +7,9 @@ using Photon.Realtime;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+	[Header("Colors")]
+	public Color[] colors;
+
 	void Awake()
 	{
 		// Photon Config
