@@ -23,7 +23,7 @@ jobs:
           path: Library
           key: lib
 
-      - uses: webbertakken/unity-builder@main
+      - uses: webbertakken/unity-builder@v1.5
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
