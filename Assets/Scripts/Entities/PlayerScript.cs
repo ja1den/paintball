@@ -21,7 +21,11 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 
 	[Header("Health")]
 	public int health;
+
+	[Space(10)]
+
 	public int zoneDamage = 20;
+	public int siphon = 100;
 
 	[Header("Weapons")]
 	public GameObject bulletPrefab;
@@ -107,7 +111,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			{
 				if (prevTime + 0.5f < Time.time)
 				{
-					photonView.RPC("Damage", RpcTarget.All, zoneDamage, -1);
+					photonView.RPC("Damage", RpcTarget.All, zoneDamage, null);
 					prevTime = Time.time;
 				}
 			}
@@ -199,7 +203,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 	}
 
 	[PunRPC]
-	public void Damage(int damage, int dealer)
+	public void Damage(int damage, int? dealer, PhotonMessageInfo info)
 	{
 		// Client's Player
 		if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
@@ -208,7 +212,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 		if (!isAlive) return;
 
 		// Apply Damage
-		health = Mathf.Max(0, health - damage);
+		health = Mathf.Clamp(health - damage, 0, maxHealth);
 
 		if (health == 0)
 		{
@@ -219,17 +223,16 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallb
 			// Spawnpoint
 			transform.position = gameManager.spawns[Random.Range(0, gameManager.spawns.Length)].transform.position;
 
-			// Zone Damage
-			if (dealer == -1) return;
-
 			// Update Score
-			Player player = PhotonNetwork.CurrentRoom.GetPlayer(dealer);
-			player.CustomProperties.TryGetValue("score", out object score);
+			info.Sender.CustomProperties.TryGetValue("score", out object score);
 
 			Hashtable playerProps = new Hashtable();
 			playerProps.Add("score", (int)(score ?? 0) + 1);
 
-			player.SetCustomProperties(playerProps);
+			info.Sender.SetCustomProperties(playerProps);
+
+			// Siphon
+			if (dealer != null) PhotonNetwork.GetPhotonView((int)dealer).RPC("Damage", RpcTarget.All, -siphon, null);
 		}
 	}
 

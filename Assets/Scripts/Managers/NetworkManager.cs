@@ -53,4 +53,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			DestroyImmediate(gameObject);
 		}
 	}
+
+	public void NewRoom()
+	{
+		PhotonNetwork.LeaveRoom();
+	}
 }

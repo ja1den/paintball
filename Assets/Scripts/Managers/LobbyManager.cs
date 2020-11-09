@@ -37,15 +37,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
-		if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
-		{
-			LoadGame();
-		}
-
 		UpdateUI();
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		UpdateUI();
+	}
+
+	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
 	{
 		UpdateUI();
 	}
@@ -60,7 +60,18 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 		infoPanel.interactable = hasWeapon;
 
 		// InfoPanel
-		playButton.gameObject.SetActive(PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount != 1);
+		bool canStart = PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount != 1;
+
+		if (canStart)
+		{
+			foreach (Player player in PhotonNetwork.PlayerList)
+			{
+				player.CustomProperties.TryGetValue("weapon", out object weapon);
+				if (weapon == null) canStart = false;
+			}
+		}
+
+		playButton.gameObject.SetActive(canStart);
 		playerText.text = $"{PhotonNetwork.CurrentRoom.PlayerCount} / {PhotonNetwork.CurrentRoom.MaxPlayers}";
 	}
 

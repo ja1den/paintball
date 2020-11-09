@@ -156,6 +156,7 @@ MonoBehaviour:
   speed: 5
   health: 200
   zoneDamage: 20
+  siphon: 100
   bulletPrefab: {fileID: 6960932168484419361, guid: 7829770e966fa3a48addd852a7b6b8b0,
     type: 3}
   isShooting: 0
@@ -331,6 +332,7 @@ MonoBehaviour:
   Synchronization: 2
   OwnershipTransfer: 0
   ObservedComponents:
+  - {fileID: 1134061387153476191}
   - {fileID: 1134061387153476186}
   - {fileID: 2047083078473598233}
   viewIdField: 0

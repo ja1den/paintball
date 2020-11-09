@@ -30,4 +30,9 @@ public class ScoreManager : MonoBehaviour
 
 		text.text = thisScore == bestScore ? "You win!" : "You lose!";
 	}
+
+	public void Click()
+	{
+		GameObject.Find("NetworkManager").GetComponent<NetworkManager>().NewRoom();
+	}
 }
