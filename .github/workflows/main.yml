@@ -1,8 +1,9 @@
 name: Firebase Deploy
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - stable
 
 jobs:
   build:
@@ -12,16 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-
-      - run: node version
-
       - uses: actions/cache@v2
         with:
           path: Library
-          key: lib
+          key: library
 
       - uses: webbertakken/unity-builder@v1.5
         env:
