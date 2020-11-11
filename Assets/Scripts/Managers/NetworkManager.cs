@@ -56,6 +56,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	public void NewRoom()
 	{
-		PhotonNetwork.LeaveRoom();
+		if (PhotonNetwork.InRoom) PhotonNetwork.LeaveRoom();
 	}
 }

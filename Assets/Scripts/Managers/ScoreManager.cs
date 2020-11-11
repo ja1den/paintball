@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -33,6 +35,18 @@ public class ScoreManager : MonoBehaviour
 
 	public void Click()
 	{
+		// Disable Button
+		GameObject.Find("PlayButton").GetComponent<Button>().interactable = false;
+
+		// CustomProperties
+		Hashtable playerProps = new Hashtable();
+
+		foreach (DictionaryEntry entry in PhotonNetwork.LocalPlayer.CustomProperties)
+			playerProps.Add(entry.Key, null);
+
+		PhotonNetwork.LocalPlayer.SetCustomProperties(playerProps);
+
+		// New Room
 		GameObject.Find("NetworkManager").GetComponent<NetworkManager>().NewRoom();
 	}
 }
