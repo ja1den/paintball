@@ -1,6 +1,6 @@
-# mlapi-pong
+# paintball
 
-> Pong, built with [MLAPI](https://mlapi.network/)
+> Paintball, built with [MLAPI](https://mlapi.network/).
 
 # Introduction
 
