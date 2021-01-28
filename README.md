@@ -1,4 +1,4 @@
-# mlapi-paintball
+# paintball
 
 > Paintball, built with [MLAPI](https://mlapi.network/).
 
